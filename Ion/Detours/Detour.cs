@@ -48,20 +48,20 @@ public sealed class Detour : IDisposable
         _process[_caveAddress].Write(0, Enumerable.Range(0, _caveLength).Select(_ => (byte)0).ToArray());
     }
 
-    public static Detour Create(IProcess process, IntPtr address, IntPtr caveAddress, byte[] caveData, int sourceLength)
+    public static Detour Create(IProcess process, IntPtr address, IntPtr caveAddress, byte[] caveData, int sourceLength, int entryPointOffset = 0)
     {
         var caveLength = caveData.Length;
         var originalData = process[address].Read(0, sourceLength);
 
         process[caveAddress].Write(0, caveData);
 
-        var jumpData = EvaluateJumpBytes(address + JumpInstructionLength, caveAddress);
+        var jumpData = EvaluateJumpBytes(address + JumpInstructionLength, caveAddress + entryPointOffset);
         var injectedData = jumpData.Concat(Enumerable.Range(0, sourceLength - JumpInstructionLength).Select(_ => NopInstructionByte)).ToArray();
 
         return new Detour(process, address, originalData, injectedData, caveAddress, caveLength);
     }
 
-    private static IntPtr FindCodeCave(IProcess process, IntPtr address, int size)
+    public static IntPtr FindCodeCave(IProcess process, IntPtr address, int size)
     {
         var module = process.Modules[0];
         var data = process[address].Read(0, (int)(module.BaseAddress.ToInt64() + module.Size - address.ToInt64()));
