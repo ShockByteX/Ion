@@ -122,5 +122,23 @@ namespace Ion.Properties {
                 return ResourceManager.GetString("ErrorFailedToWriteTo", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value cannot be null ({0}).
+        /// </summary>
+        internal static string ErrorValueCannotBeNull {
+            get {
+                return ResourceManager.GetString("ErrorValueCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value cannot be null or empty ({0}).
+        /// </summary>
+        internal static string ErrorValueCannotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("ErrorValueCannotBeNullOrEmpty", resourceCulture);
+            }
+        }
     }
 }

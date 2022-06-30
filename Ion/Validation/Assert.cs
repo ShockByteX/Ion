@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Ion.Properties;
 
 namespace Ion.Validation;
 
@@ -25,20 +26,19 @@ internal static class Assert
     }
 
     public static void That(bool condition) => That<Exception>(condition);
-    public static void That(bool condition, string message) => That(condition, () => new Exception(message));
     public static void ThatArgument(bool condition, string message, [CallerMemberName] string? parameterName = null) => That(condition, () => new ArgumentException(message, parameterName));
 
     public static T NotNull<T>(T? value, [CallerMemberName] string? parameterName = null)
     {
         return value is null
-            ? throw new ArgumentNullException(parameterName, $"Value cannot be null ({parameterName})")
+            ? throw new ArgumentNullException(parameterName, string.Format(Resources.ErrorValueCannotBeNull, parameterName))
             : value;
     }
 
     public static string NotNullOrEmpty(string? value, [CallerMemberName] string? parameterName = null)
     {
         return string.IsNullOrEmpty(value)
-            ? throw new ArgumentNullException(parameterName, $"Value cannot be null or empty ({parameterName})")
+            ? throw new ArgumentNullException(parameterName, string.Format(Resources.ErrorValueCannotBeNullOrEmpty, parameterName))
             : value;
     }
 

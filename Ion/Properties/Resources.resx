@@ -138,4 +138,10 @@
   <data name="ErrorFailedToWriteTo" xml:space="preserve">
     <value>Failed to write to: 0x{0}</value>
   </data>
+  <data name="ErrorValueCannotBeNullOrEmpty" xml:space="preserve">
+	  <value>Value cannot be null or empty ({0})</value>
+  </data>
+  <data name="ErrorValueCannotBeNull" xml:space="preserve">
+	  <value>Value cannot be null ({0})</value>
+  </data>
 </root>
