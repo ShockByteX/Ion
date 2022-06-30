@@ -1,12 +1,11 @@
 ﻿using System.Text;
-using Ion.Handles;
 using Ion.Marshaling;
 
 namespace Ion.Memory;
 
 public interface IProcessMemory
 {
-    SafeProcessHandle Handle { get; }
+    IProcess Process { get; }
 
     byte[] Read(IntPtr address, int length);
     T Read<T>(IntPtr address);
@@ -20,16 +19,16 @@ public interface IProcessMemory
     void Write(IntPtr address, string text, Encoding encoding);
 }
 
-internal abstract class ProcessMemory : IProcessMemory
+public abstract class ProcessMemory : IProcessMemory
 {
     public const char NullTerminator = '\0';
 
-    protected ProcessMemory(SafeProcessHandle handle)
+    protected ProcessMemory(IProcess process)
     {
-        Handle = handle;
+        Process = process;
     }
 
-    public SafeProcessHandle Handle { get; }
+    public IProcess Process { get; }
 
     public T[] Read<T>(IntPtr address, int length)
     {

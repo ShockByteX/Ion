@@ -25,7 +25,7 @@ internal sealed class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IM
     {
         get
         {
-            Memory.Handle.Query(Address, out var memoryInfo);
+            Memory.Process.Handle.Query(Address, out var memoryInfo);
             return memoryInfo;
         }
 
@@ -55,12 +55,12 @@ internal sealed class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IM
 
     public IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
     {
-        return MemoryProtection.Change(Memory.Handle, Address, (int)Information.RegionSize, protection);
+        return MemoryProtection.Change(Memory.Process.Handle, Address, (int)Information.RegionSize, protection);
     }
 
     public void Release()
     {
-        Memory.Handle.ReleaseMemoryPage(Address);
+        Memory.Process.Handle.ReleaseMemoryPage(Address);
         Address = IntPtr.Zero;
     }
 

@@ -34,12 +34,12 @@ public sealed class ExtendedProcess : IProcess
 
     public static IProcess CurrentProcess => LazyCurrentProcess.Value;
 
-    private ExtendedProcess(int processId, ProcessInfo info, SafeProcessHandle handle, IProcessMemory memory)
+    private ExtendedProcess(int processId, ProcessInfo info, SafeProcessHandle handle, bool local)
     {
         Id = processId;
         Name = info.Name;
         Handle = handle;
-        Memory = memory;
+        Memory = local? new LocalProcessMemory(this) : new RemoteProcessMemory(this);
         ModuleManager = new ModuleManager(this);
     }
 
@@ -119,10 +119,6 @@ public sealed class ExtendedProcess : IProcess
 
         Assert.IsValid(handle);
 
-        IProcessMemory memory = local
-            ? new LocalProcessMemory(handle)
-            : new RemoteProcessMemory(handle);
-
-        return new ExtendedProcess(processId, info, handle, memory);
+        return new ExtendedProcess(processId, info, handle, local);
     }
 }
