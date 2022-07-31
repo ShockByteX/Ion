@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Ion.Properties;
@@ -28,7 +29,7 @@ internal static class Assert
     public static void That(bool condition) => That<Exception>(condition);
     public static void ThatArgument(bool condition, string message, [CallerMemberName] string? parameterName = null) => That(condition, () => new ArgumentException(message, parameterName));
 
-    public static T NotNull<T>(T? value, [CallerMemberName] string? parameterName = null)
+    public static T NotNull<T>([NotNull] T? value, [CallerMemberName] string? parameterName = null)
     {
         return value is null
             ? throw new ArgumentNullException(parameterName, string.Format(Resources.ErrorValueCannotBeNull, parameterName))

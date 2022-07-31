@@ -76,6 +76,15 @@ internal static unsafe class Kernel32
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool FreeLibrary(IntPtr hModule);
 
+    [DllImport(LibraryName)]
+    public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, int dwThreadId);
+
+    [DllImport(LibraryName)]
+    public static extern uint SuspendThread(IntPtr hThread);
+
+    [DllImport(LibraryName)]
+    public static extern int ResumeThread(IntPtr hThread);
+
     public static int VirtualQueryEx(SafeProcessHandle hProcess, IntPtr lpAddress, out MemoryBasicInformation lpBuffer)
     {
         int result;

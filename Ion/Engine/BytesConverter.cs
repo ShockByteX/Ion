@@ -9,15 +9,7 @@ public static class BytesConverter
         for (var i = 0; i < BytesArray.Length; i++)
         {
             var strByte = i.ToString("X");
-
-            if (strByte.Length == 1)
-            {
-                BytesArray[i] = $"0{strByte}";
-            }
-            else
-            {
-                BytesArray[i] = strByte;
-            }
+            BytesArray[i] = strByte.Length == 1 ? $"0{strByte}" : strByte;
         }
     }
 
