@@ -74,6 +74,7 @@ public static class MarshalType
             case TypeCode.Boolean: return MemoryMarshal.Read<bool>(data.Span);
             case TypeCode.Byte:
             case TypeCode.SByte: return data.Span[0];
+            case TypeCode.Char: return (char)data.Span[0];
             case TypeCode.Int16: return MemoryMarshal.Read<short>(data.Span);
             case TypeCode.UInt16: return MemoryMarshal.Read<ushort>(data.Span);
             case TypeCode.Int32: return MemoryMarshal.Read<int>(data.Span);

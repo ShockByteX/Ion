@@ -13,11 +13,14 @@ public interface IMemoryRegion : IEquatable<IMemoryRegion>, IMemoryPointer
     bool IsGuarded { get; }
     bool IsOperableGuarded { get; }
 
+    bool IsInRange(IntPtr address);
+    bool IsInRange(long address);
+
     IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite);
     void Release();
 }
 
-internal sealed class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRegion
+internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRegion
 {
     public MemoryRegion(IProcessMemory memory, IntPtr address) : base(memory, address) { }
 
@@ -52,6 +55,14 @@ internal sealed class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IM
 
     public bool IsGuarded => Information.MemoryProtection.HasFlag(MemoryProtectionFlags.Guard);
     public bool IsOperableGuarded => (IsReadable | IsWritable | IsExecutable) && IsGuarded;
+
+    public bool IsInRange(IntPtr address) => IsInRange(address.ToInt64());
+
+    public bool IsInRange(long address)
+    {
+        var regionAddressValue = Information.BaseAddress.ToInt64();
+        return address > regionAddressValue && address < regionAddressValue + Information.RegionSize;
+    }
 
     public IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
     {

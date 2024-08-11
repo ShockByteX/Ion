@@ -1,4 +1,6 @@
 ﻿using Ion.Exceptions;
+using Ion.Extensions;
+using Ion.Memory;
 using Ion.Native;
 using Ion.Validation;
 
@@ -12,6 +14,9 @@ public interface IProcessModule
     int Size { get; }
     IntPtr BaseAddress { get; }
     IProcessFunction this[string functionName] { get; }
+
+    IMemoryDump Dump();
+    IReadOnlyCollection<IMemoryRegion> GetMemoryRegions();
 
     void Free();
 }
@@ -36,6 +41,13 @@ internal sealed class ProcessModule : IProcessModule
     public IntPtr BaseAddress { get; }
 
     public IProcessFunction this[string functionName] => FindFunction(functionName);
+
+    public IMemoryDump Dump() => MemoryDump.Dump(Process, BaseAddress, Size);
+
+    public IReadOnlyCollection<IMemoryRegion> GetMemoryRegions()
+    {
+        return Process.Memory.GetMemoryRegions(BaseAddress, BaseAddress.Add(Size));
+    }
 
     public IProcessFunction FindFunction(string functionName)
     {

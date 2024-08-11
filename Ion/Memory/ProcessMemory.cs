@@ -1,11 +1,15 @@
 ﻿using System.Text;
+using Ion.Extensions;
 using Ion.Marshaling;
+using Ion.Native;
 
 namespace Ion.Memory;
 
 public interface IProcessMemory
 {
     IProcess Process { get; }
+
+    IReadOnlyCollection<IMemoryRegion> GetMemoryRegions(IntPtr minAddress, IntPtr maxAddress);
 
     byte[] Read(IntPtr address, int length);
     T Read<T>(IntPtr address);
@@ -29,6 +33,20 @@ public abstract class ProcessMemory : IProcessMemory
     }
 
     public IProcess Process { get; }
+
+    public IReadOnlyCollection<IMemoryRegion> GetMemoryRegions(IntPtr minAddress, IntPtr maxAddress)
+    {
+        var regions = new List<MemoryRegion>();
+        var maxAddressValue = maxAddress.ToInt64();
+
+        while (Kernel32.VirtualQueryEx(Process.Handle, minAddress, out var info) > 0 && minAddress.ToInt64() < maxAddressValue)
+        {
+            regions.Add(new MemoryRegion(this, minAddress));
+            minAddress = info.BaseAddress.Add(info.RegionSize);
+        }
+
+        return regions;
+    }
 
     public T[] Read<T>(IntPtr address, int length)
     {

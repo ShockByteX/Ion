@@ -6,10 +6,11 @@ using Ion.Modules;
 using Ion.Native;
 using Ion.Extensions;
 using Ion.Validation;
+using Ion.PE32;
 
 namespace Ion;
 
-public interface IProcess : IDisposable
+public interface IProcess
 {
     int Id { get; }
     string Name { get; }
@@ -24,13 +25,16 @@ public interface IProcess : IDisposable
     IProcessModule this[string moduleName] { get; }
 
     MemoryObject<T> AllocateObject<T>();
+    IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection);
     IntPtr ScanFirst(string pattern);
-    IEnumerable<IMemoryRegion> GetMemoryRegions();
+    IReadOnlyCollection<IMemoryRegion> GetMemoryRegions();
 }
 
-public sealed class ExtendedProcess : IProcess
+public interface IProcessDisposable : IProcess, IDisposable { }
+
+public sealed class ExtendedProcess : IProcessDisposable
 {
-    private static readonly Lazy<IProcess> LazyCurrentProcess = new(() => GetProcess(Environment.ProcessId, true));
+    private static readonly Lazy<IProcess> LazyCurrentProcess = new(() => GetProcess(Environment.ProcessId, false));
 
     public static IProcess CurrentProcess => LazyCurrentProcess.Value;
 
@@ -39,7 +43,7 @@ public sealed class ExtendedProcess : IProcess
         Id = processId;
         Name = info.Name;
         Handle = handle;
-        Memory = local? new LocalProcessMemory(this) : new RemoteProcessMemory(this);
+        Memory = local ? new LocalProcessMemory(this) : new RemoteProcessMemory(this);
         ModuleManager = new ModuleManager(this);
     }
 
@@ -59,13 +63,14 @@ public sealed class ExtendedProcess : IProcess
     public IProcessModule this[string moduleName] => ModuleManager[moduleName];
 
     public MemoryObject<T> AllocateObject<T>() => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
+    public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
 
     public IntPtr ScanFirst(string pattern)
     {
         foreach (var module in Modules)
         {
             var data = this[module.BaseAddress].Read(0, module.Size);
-            var result = SignatureScanner.Scan(data, pattern, true);
+            var result = SignatureScanner.Scan(data, pattern, 0, true);
 
             if (result.Count > 0)
             {
@@ -76,22 +81,10 @@ public sealed class ExtendedProcess : IProcess
         return IntPtr.Zero;
     }
 
-    public IEnumerable<IMemoryRegion> GetMemoryRegions()
+    public IReadOnlyCollection<IMemoryRegion> GetMemoryRegions()
     {
-        var regions = new List<MemoryRegion>();
-
         Kernel32.GetSystemInfo(out var systemInfo);
-
-        var maxAddress = (long)systemInfo.MaximumApplicationAddress;
-        var currentAddress = IntPtr.Zero;
-
-        while (Kernel32.VirtualQueryEx(Handle, currentAddress, out var info) > 0 && currentAddress.ToInt64() < maxAddress)
-        {
-            regions.Add(new MemoryRegion(Memory, currentAddress));
-            currentAddress = info.BaseAddress.Add(info.RegionSize);
-        }
-
-        return regions;
+        return Memory.GetMemoryRegions(IntPtr.Zero, systemInfo.MaximumApplicationAddress);
     }
 
     public void Dispose()
@@ -110,9 +103,9 @@ public sealed class ExtendedProcess : IProcess
 
     public override string ToString() => $"Id: {Id}, Name: {Name}";
 
-    public static IProcess GetProcess(int processId) => GetProcess(processId, Environment.ProcessId == processId);
+    public static IProcessDisposable GetProcess(int processId) => GetProcess(processId, Environment.ProcessId == processId);
 
-    private static IProcess GetProcess(int processId, bool local)
+    private static IProcessDisposable GetProcess(int processId, bool local)
     {
         var info = ProcessManager.FindById(processId);
         var handle = Kernel32.OpenProcess(ProcessAccessFlags.AllAccess, false, processId);

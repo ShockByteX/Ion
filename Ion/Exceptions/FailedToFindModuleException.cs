@@ -2,8 +2,6 @@
 
 namespace Ion.Exceptions;
 
-public sealed class FailedToFindModuleException : Exception
-{
-    public FailedToFindModuleException(IProcess process, string moduleName) 
-        : base(string.Format(Resources.ErrorFailedToFindModule, moduleName, process.Id, process.Name)) { }
-}
+public sealed class FailedToFindModuleException(IProcess process, string moduleName)
+    : Exception(string.Format(Resources.ErrorFailedToFindModule, moduleName, process.Id, process.Name))
+{ }

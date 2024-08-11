@@ -78,4 +78,11 @@ internal static class SafeProcessHandleExtension
         Assert.IsValid(address);
         Assert.Win32(Kernel32.VirtualFreeEx(handle, address, 0, MemoryReleaseFlags.Release), string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
     }
+
+    public static void ReleaseMemoryPage(this SafeProcessHandle handle, IntPtr address, int size)
+    {
+        Assert.IsValid(handle);
+        Assert.IsValid(address);
+        Assert.Win32(Kernel32.VirtualFreeEx(handle, address, size, MemoryReleaseFlags.Decommit), string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
+    }
 }
