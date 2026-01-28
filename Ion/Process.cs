@@ -6,7 +6,7 @@ using Ion.Modules;
 using Ion.Native;
 using Ion.Extensions;
 using Ion.Validation;
-using Ion.PE32;
+using Ion.Threading;
 
 namespace Ion;
 
@@ -26,6 +26,7 @@ public interface IProcess
 
     MemoryObject<T> AllocateObject<T>();
     IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection);
+    IProcessThreadDisposable CreateThread(IntPtr functionPointer, IntPtr parameterPointer, ThreadCreationFlags flags);
     IntPtr ScanFirst(string pattern);
     IReadOnlyCollection<IMemoryRegion> GetMemoryRegions();
 }
@@ -64,6 +65,11 @@ public sealed class ExtendedProcess : IProcessDisposable
 
     public MemoryObject<T> AllocateObject<T>() => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
     public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
+
+    public IProcessThreadDisposable CreateThread(IntPtr functionPointer, IntPtr parameterPointer, ThreadCreationFlags flags)
+    {
+        return ProcessThread.Create(Handle, functionPointer, parameterPointer, flags);
+    }
 
     public IntPtr ScanFirst(string pattern)
     {
@@ -110,7 +116,7 @@ public sealed class ExtendedProcess : IProcessDisposable
         var info = ProcessManager.FindById(processId);
         var handle = Kernel32.OpenProcess(ProcessAccessFlags.AllAccess, false, processId);
 
-        Assert.IsValid(handle);
+        Ensure.IsValid(handle);
 
         return new ExtendedProcess(processId, info, handle, local);
     }

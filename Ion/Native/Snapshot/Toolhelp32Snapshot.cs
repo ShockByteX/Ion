@@ -32,7 +32,7 @@ internal abstract class Toolhelp32Snapshot<TEntity> where TEntity : struct
         {
             handle = Kernel32.CreateToolhelp32Snapshot(_flags, _processId);
 
-            Assert.IsValid(handle);
+            Ensure.IsValid(handle);
 
             var entry = _create();
 

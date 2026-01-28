@@ -27,7 +27,7 @@ internal sealed class AllocatedMemory : MemoryPointer, IAllocatedMemory
     {
         var address = Kernel32.VirtualAllocEx(memory.Process.Handle, IntPtr.Zero, size, allocation, protection);
 
-        Assert.Win32(address != IntPtr.Zero);
+        Ensure.Win32(address != IntPtr.Zero);
 
         return new AllocatedMemory(memory, address, size);
     }

@@ -2,6 +2,8 @@
 using Ion.Memory;
 using Ion.Extensions;
 using Ion.Validation;
+using Ion.Native;
+using System.Text;
 
 namespace Ion.Modules;
 
@@ -10,22 +12,33 @@ public interface IProcessFunction : IEquatable<IProcessFunction>
     IntPtr Address { get; }
     string Name { get; }
     T GetDelegate<T>();
+    int Execute(IntPtr parameterPointer);
+    int Execute(string parameter, Encoding encoding);
 }
 
-internal sealed class ProcessFunction : MemoryPointer, IEquatable<ProcessFunction>, IProcessFunction
+internal sealed class ProcessFunction(IProcess process, IntPtr address, string name) 
+    : MemoryPointer(process.Memory, address), IEquatable<ProcessFunction>, IProcessFunction
 {
-    public ProcessFunction(IProcessMemory memory, IntPtr address, string name) : base(memory, address)
-    {
-        Name = name;
-    }
-
-    public string Name { get; }
+    public string Name { get; } = name;
 
     public T GetDelegate<T>()
     {
-        Assert.IsValid(Address);
+        Ensure.IsValid(Address);
 
         return Marshal.GetDelegateForFunctionPointer<T>(Address);
+    }
+
+    public int Execute(IntPtr parameterPointer)
+    {
+        using var thread = process.CreateThread(Address, parameterPointer, ThreadCreationFlags.ThreadCreateRunImmediately);
+        return thread.Wait();
+    }
+
+    public int Execute(string parameter, Encoding encoding)
+    {
+        using var allocatedMemory = process.AllocateMemory(encoding.GetByteCount(parameter) + 1, MemoryAllocationFlags.Commit | MemoryAllocationFlags.Reserve, MemoryProtectionFlags.ReadWrite);
+        allocatedMemory.Write(0, parameter, encoding);
+        return Execute(allocatedMemory.Address);
     }
 
     public bool Equals(ProcessFunction? other) => Equals((IProcessFunction?)other);

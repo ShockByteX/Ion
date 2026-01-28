@@ -20,11 +20,11 @@ internal sealed class LocalModuleReflection : IDisposable
     {
         var address = Kernel32.GetProcAddress(_localModule.BaseAddress, functionName);
 
-        Assert.Win32(address != IntPtr.Zero);
+        Ensure.Win32(address != IntPtr.Zero);
 
         var offset = (int)(address.ToInt64() - _localModule.BaseAddress.ToInt64());
 
-        return new ProcessFunction(_remoteModule.Process.Memory, _remoteModule.BaseAddress + offset, functionName);
+        return new ProcessFunction(_remoteModule.Process, _remoteModule.BaseAddress + offset, functionName);
     }
 
     public void Dispose()

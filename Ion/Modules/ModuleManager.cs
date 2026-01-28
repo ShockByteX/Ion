@@ -2,6 +2,8 @@
 using Ion.Native;
 using Ion.Native.Snapshot;
 using Ion.Validation;
+using System.Diagnostics;
+using System.Text;
 
 namespace Ion.Modules;
 
@@ -33,9 +35,26 @@ internal sealed class ModuleManager : IModuleManager
     {
         try
         {
-            Assert.FileExists(path);
-            Assert.Win32(Kernel32.LoadLibrary(path) != IntPtr.Zero);
-            Assert.That(TryFindByPath(path, out var module));
+            Ensure.FileExists(path);
+
+            if (_process.IsCurrent)
+            {
+                Ensure.Win32(Kernel32.LoadLibrary(path) != IntPtr.Zero);
+            }
+            else
+            {
+                var kernel32Module = this[Kernel32.LibraryName];
+                var loadLibraryFunction = kernel32Module["LoadLibraryW"];
+                var libraryPath = Path.GetFullPath(path);
+                var result = loadLibraryFunction.Execute(libraryPath, Encoding.Unicode);
+
+                Trace.WriteLine($"LoadLibrary: 0x{result:x}");
+
+                Ensure.That(result > 0);
+            }
+
+            Ensure.Win32(Kernel32.LoadLibrary(path) != IntPtr.Zero);
+            Ensure.That(TryFindByPath(path, out var module));
 
             return module!;
         }

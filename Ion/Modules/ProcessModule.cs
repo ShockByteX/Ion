@@ -55,7 +55,7 @@ internal sealed class ProcessModule : IProcessModule
 
         try
         {
-            Assert.NotNullOrEmpty(functionName);
+            Ensure.NotNullOrEmpty(functionName);
 
             var moduleFunction = new ModuleFunction(Process.Handle, Path, functionName);
 
@@ -82,7 +82,7 @@ internal sealed class ProcessModule : IProcessModule
     {
         if (Process.IsCurrent)
         {
-            Assert.Win32(Kernel32.FreeLibrary(BaseAddress));
+            Ensure.Win32(Kernel32.FreeLibrary(BaseAddress));
             return;
         }
     }

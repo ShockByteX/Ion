@@ -20,13 +20,13 @@ public sealed class MemoryObject<T> : IDisposable
 
     public T GetValue<T>()
     {
-        Assert.That(MarshalType<T>.Size == Size);
+        Ensure.That(MarshalType<T>.Size == Size);
         return _process[Address].Read<T>(0);
     }
 
     public void SetValue<T>(T value)
     {
-        Assert.That(MarshalType<T>.Size == Size);
+        Ensure.That(MarshalType<T>.Size == Size);
         _process[Address].Write(0, value);
     }
 

@@ -16,7 +16,7 @@ internal static class IntPtrExtension
 
     public static unsafe byte[] ReadMemory(this IntPtr address, int length, bool copy = false)
     {
-        Assert.IsValid(address);
+        Ensure.IsValid(address);
 
         try
         {
@@ -63,7 +63,7 @@ internal static class IntPtrExtension
     {
         try
         {
-            Assert.IsValid(address);
+            Ensure.IsValid(address);
             return Unsafe.Read<T>(address.ToPointer());
         }
         catch (AccessViolationException e)

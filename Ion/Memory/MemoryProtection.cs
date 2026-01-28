@@ -40,7 +40,7 @@ internal sealed class MemoryProtection : IMemoryProtection
         {
             if (!_handle.IsClosed && !_handle.IsInvalid)
             {
-                Assert.Win32(Kernel32.VirtualProtectEx(_handle, Address, Size, OldProtection, out _));
+                Ensure.Win32(Kernel32.VirtualProtectEx(_handle, Address, Size, OldProtection, out _));
             }
 
             _disposed = true;
@@ -52,10 +52,10 @@ internal sealed class MemoryProtection : IMemoryProtection
 
     public static IMemoryProtection Change(SafeProcessHandle handle, IntPtr address, int size, MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
     {
-        Assert.IsValid(handle);
-        Assert.IsValid(address);
-        Assert.OutOfRange(size, 0, int.MaxValue, nameof(size));
-        Assert.Win32(Kernel32.VirtualProtectEx(handle, address, size, MemoryProtectionFlags.ExecuteReadWrite, out var oldProtection));
+        Ensure.IsValid(handle);
+        Ensure.IsValid(address);
+        Ensure.OutOfRange(size, 0, int.MaxValue, nameof(size));
+        Ensure.Win32(Kernel32.VirtualProtectEx(handle, address, size, MemoryProtectionFlags.ExecuteReadWrite, out var oldProtection));
 
         return new MemoryProtection(handle, address, size, protection, oldProtection);
     }

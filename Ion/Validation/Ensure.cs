@@ -6,7 +6,7 @@ using Ion.Properties;
 
 namespace Ion.Validation;
 
-internal static class Assert
+internal static class Ensure
 {
     public static void Throw<TException>() where TException : Exception, new() => throw new TException();
 

@@ -3,7 +3,7 @@ using Ion.Handles;
 
 namespace Ion.Native;
 
-internal static unsafe class Kernel32
+internal unsafe partial class Kernel32
 {
     public const string LibraryName = "kernel32.dll";
 

@@ -96,3 +96,33 @@ public enum ThreadAccess
     Impersonate = 0x0100,
     DirectImpersonation = 0x0200
 }
+
+[Flags]
+public enum ThreadAccessFlags : uint
+{
+    Terminate = 0x1,
+    SuspendResume = 0x2,
+    GetContext = 0x8,
+    SetContext = 0x10,
+    SetInformation = 0x20,
+    QueryInformation = 0x40,
+    SetThreadToken = 0x80,
+    Impersonate = 0x100,
+    DirectImpersonation = 0x200
+}
+
+[Flags]
+public enum ThreadCreationFlags : uint
+{
+    ThreadCreateRunImmediately = 0x0,
+    ThreadCreateSuspended = 0x4,
+    StackSizeParamIsAReservation = 0x10000,
+}
+
+public enum WaitObjectResult : uint
+{
+    Signaled = 0x0,
+    Abandoned = 0x80,
+    Timeout = 0x102,
+    Failed = 0xffffffff
+}

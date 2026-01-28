@@ -27,11 +27,11 @@ public static class Drivers
 
     public static IReadOnlyCollection<nint> Enum()
     {
-        Assert.That(Psapi.EnumDeviceDrivers(null, 0, out var bytesNeeded));
+        Ensure.That(Psapi.EnumDeviceDrivers(null, 0, out var bytesNeeded));
 
         var addresses = new nint[bytesNeeded / IntPtr.Size];
 
-        Assert.That(Psapi.EnumDeviceDrivers(addresses, bytesNeeded, out _));
+        Ensure.That(Psapi.EnumDeviceDrivers(addresses, bytesNeeded, out _));
 
         return addresses;
     }

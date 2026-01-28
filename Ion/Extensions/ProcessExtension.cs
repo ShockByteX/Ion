@@ -8,7 +8,7 @@ public static class ProcessExtension
 {
     public static void Suspend(this Process? process)
     {
-        Assert.NotNull(process);
+        Ensure.NotNull(process);
 
         foreach (ProcessThread thread in process.Threads)
         {
@@ -18,7 +18,7 @@ public static class ProcessExtension
 
     public static void Resume(this Process? process)
     {
-        Assert.NotNull(process);
+        Ensure.NotNull(process);
 
         foreach (ProcessThread thread in process.Threads)
         {

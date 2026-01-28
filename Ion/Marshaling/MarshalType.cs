@@ -92,7 +92,7 @@ public static class MarshalType
         {
             fixed (byte* pData = data.Span)
             {
-                return Assert.NotNull(Marshal.PtrToStructure((IntPtr)pData, type));
+                return Ensure.NotNull(Marshal.PtrToStructure((IntPtr)pData, type));
             }
         }
     }
@@ -128,7 +128,7 @@ public static class MarshalType<T>
 
     public static byte[] Convert(T? value)
     {
-        return MarshalType.Convert(Assert.NotNull(value as object, nameof(value)), RealType, TypeCode, Size);
+        return MarshalType.Convert(Ensure.NotNull(value as object, nameof(value)), RealType, TypeCode, Size);
     }
 
     public static T Convert(Memory<byte> data)

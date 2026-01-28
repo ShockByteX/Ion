@@ -30,7 +30,7 @@ internal class PortableExecutableBinary
 
     public static PortableExecutableBinary Load(string filePath)
     {
-        Assert.FileExists(filePath);
+        Ensure.FileExists(filePath);
 
         var data = File.ReadAllBytes(filePath);
 
