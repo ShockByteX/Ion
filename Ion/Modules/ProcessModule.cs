@@ -12,7 +12,7 @@ public interface IProcessModule
     string Name { get; }
     string Path { get; }
     int Size { get; }
-    IntPtr BaseAddress { get; }
+    nint BaseAddress { get; }
     IProcessFunction this[string functionName] { get; }
 
     IMemoryDump Dump();
@@ -38,7 +38,7 @@ internal sealed class ProcessModule : IProcessModule
     public string Name { get; }
     public string Path { get; }
     public int Size { get; }
-    public IntPtr BaseAddress { get; }
+    public nint BaseAddress { get; }
 
     public IProcessFunction this[string functionName] => FindFunction(functionName);
 

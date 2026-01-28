@@ -56,9 +56,9 @@ internal sealed class ProcessThread(SafeThreadHandle threadHandle, uint id) : IP
     public override bool Equals(object? obj) => obj is IProcessThread other && Equals(other);
     public override int GetHashCode() => Id.GetHashCode();
 
-    public static IProcessThreadDisposable Create(SafeProcessHandle processHandle, IntPtr functionPointer, IntPtr parameterPointer, ThreadCreationFlags flags)
+    public static IProcessThreadDisposable Create(SafeProcessHandle processHandle, nint functionPointer, nint parameterPointer, ThreadCreationFlags flags)
     {
-        var threadHandle = Kernel32.CreateRemoteThread(processHandle, IntPtr.Zero, 0, functionPointer, parameterPointer, flags, out var threadId);
+        var threadHandle = Kernel32.CreateRemoteThread(processHandle, nint.Zero, 0, functionPointer, parameterPointer, flags, out var threadId);
         return new ProcessThread(threadHandle, threadId);
     }
 }

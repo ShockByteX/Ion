@@ -10,11 +10,11 @@ namespace Ion.Extensions;
 
 internal static class IntPtrExtension
 {
-    public static IntPtr Add(this IntPtr address, long value) => new(address.ToInt64() + value);
+    public static nint Add(this nint address, long value) => new(address.ToInt64() + value);
 
-    public static string ToHexadecimalString(this IntPtr address) => $"0x{address.ToInt64():X}";
+    public static string ToHexadecimalString(this nint address) => $"0x{address.ToInt64():X}";
 
-    public static unsafe byte[] ReadMemory(this IntPtr address, int length, bool copy = false)
+    public static unsafe byte[] ReadMemory(this nint address, int length, bool copy = false)
     {
         Ensure.IsValid(address);
 
@@ -27,7 +27,7 @@ internal static class IntPtrExtension
 
                 fixed (byte* pData = data)
                 {
-                    Msvcrt.memcpy((IntPtr)pData, address, length);
+                    Msvcrt.memcpy((nint)pData, address, length);
                 }
 
                 return data;
@@ -41,7 +41,7 @@ internal static class IntPtrExtension
         }
     }
 
-    public static unsafe int WriteMemory(this IntPtr address, SafeProcessHandle handle, byte[] data, bool copy = false)
+    public static unsafe int WriteMemory(this nint address, SafeProcessHandle handle, byte[] data, bool copy = false)
     {
         return handle.WriteMemoryProtected(address, data.Length, () =>
         {
@@ -49,7 +49,7 @@ internal static class IntPtrExtension
             {
                 fixed (byte* pData = data)
                 {
-                    Msvcrt.memcpy(address, (IntPtr)pData, data.Length);
+                    Msvcrt.memcpy(address, (nint)pData, data.Length);
                 }
             }
             else
@@ -59,7 +59,7 @@ internal static class IntPtrExtension
         });
     }
 
-    public static unsafe T Read<T>(this IntPtr address)
+    public static unsafe T Read<T>(this nint address)
     {
         try
         {
@@ -72,7 +72,7 @@ internal static class IntPtrExtension
         }
     }
 
-    public static unsafe int Write<T>(this IntPtr address, SafeProcessHandle handle, T value)
+    public static unsafe int Write<T>(this nint address, SafeProcessHandle handle, T value)
     {
         return handle.WriteMemoryProtected(address, MarshalType<T>.Size, () =>
         {

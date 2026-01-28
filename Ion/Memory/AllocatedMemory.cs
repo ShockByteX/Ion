@@ -11,7 +11,7 @@ public interface IAllocatedMemory : IMemoryPointer, IDisposable
 
 internal sealed class AllocatedMemory : MemoryPointer, IAllocatedMemory
 {
-    private AllocatedMemory(IProcessMemory memory, IntPtr address, int size) : base(memory, address)
+    private AllocatedMemory(IProcessMemory memory, nint address, int size) : base(memory, address)
     {
         Size = size;
     }
@@ -25,9 +25,9 @@ internal sealed class AllocatedMemory : MemoryPointer, IAllocatedMemory
 
     public static IAllocatedMemory Allocate(IProcessMemory memory, int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection)
     {
-        var address = Kernel32.VirtualAllocEx(memory.Process.Handle, IntPtr.Zero, size, allocation, protection);
+        var address = Kernel32.VirtualAllocEx(memory.Process.Handle, nint.Zero, size, allocation, protection);
 
-        Ensure.Win32(address != IntPtr.Zero);
+        Ensure.Win32(address != nint.Zero);
 
         return new AllocatedMemory(memory, address, size);
     }

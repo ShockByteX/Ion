@@ -22,14 +22,14 @@ public static class Drivers
                 return address;
         }
 
-        return IntPtr.Zero;
+        return nint.Zero;
     }
 
     public static IReadOnlyCollection<nint> Enum()
     {
         Ensure.That(Psapi.EnumDeviceDrivers(null, 0, out var bytesNeeded));
 
-        var addresses = new nint[bytesNeeded / IntPtr.Size];
+        var addresses = new nint[bytesNeeded / nint.Size];
 
         Ensure.That(Psapi.EnumDeviceDrivers(addresses, bytesNeeded, out _));
 

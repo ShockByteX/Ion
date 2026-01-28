@@ -4,7 +4,7 @@ namespace Ion.Memory;
 
 public interface IMemoryDump
 {
-    public IntPtr Address { get; }
+    public nint Address { get; }
 
     byte[] GetData();
     int ScanFirst(byte[] signature, byte unknownByte, int offset, int extra, bool relative);
@@ -16,25 +16,25 @@ internal sealed class MemoryDump : IMemoryDump
     private readonly IProcess _process;
     private readonly byte[] _data;
 
-    public MemoryDump(IProcess process, IntPtr address, byte[] data)
+    public MemoryDump(IProcess process, nint address, byte[] data)
     {
         _process = process;
         Address = address;
         _data = data;
     }
 
-    public IntPtr Address { get; }
+    public nint Address { get; }
 
     public byte[] GetData() => _data.ToArray();
 
     public int ScanFirst(byte[] signature, byte unknownByte, int offset, int extra, bool relative)
     {
         var result = SignatureScanner.ScanFirst(_data, signature, unknownByte);
-        var address = IntPtr.Add(Address, result + offset);
+        var address = nint.Add(Address, result + offset);
 
         if (relative)
         {
-            address = _process[address].Read<IntPtr>(0);
+            address = _process[address].Read<nint>(0);
         }
 
         return address.ToInt32() + extra;
@@ -52,7 +52,7 @@ internal sealed class MemoryDump : IMemoryDump
         return result + extra;
     }
 
-    public static IMemoryDump Dump(IProcess process, IntPtr address, int size)
+    public static IMemoryDump Dump(IProcess process, nint address, int size)
     {
         var data = process[address].Read(0, size);
         return new MemoryDump(process, address, data);

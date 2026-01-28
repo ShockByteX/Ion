@@ -4,7 +4,7 @@ namespace Ion.Memory;
 
 public interface IMemoryPointer : IEquatable<IMemoryPointer>
 {
-    IntPtr Address { get; }
+    nint Address { get; }
     IProcessMemory Memory { get; }
 
     bool IsValid { get; }
@@ -23,15 +23,15 @@ public interface IMemoryPointer : IEquatable<IMemoryPointer>
 
 internal class MemoryPointer : IEquatable<MemoryPointer>, IMemoryPointer
 {
-    public MemoryPointer(IProcessMemory memory, IntPtr address)
+    public MemoryPointer(IProcessMemory memory, nint address)
     {
         Memory = memory;
         Address = address;
     }
 
     public IProcessMemory Memory { get; }
-    public IntPtr Address { get; protected set; }
-    public virtual bool IsValid => Address != IntPtr.Zero;
+    public nint Address { get; protected set; }
+    public virtual bool IsValid => Address != nint.Zero;
 
     public byte[] Read(int offset, int length) => Memory.Read(Address + offset, length);
     public T Read<T>(int offset) => Memory.Read<T>(Address + offset);

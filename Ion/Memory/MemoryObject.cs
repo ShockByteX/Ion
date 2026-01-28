@@ -8,14 +8,14 @@ public sealed class MemoryObject<T> : IDisposable
 {
     private readonly IProcess _process;
 
-    public MemoryObject(IProcess process, IntPtr address, int size)
+    public MemoryObject(IProcess process, nint address, int size)
     {
         _process = process;
         Address = address;
         Size = size;
     }
 
-    public IntPtr Address { get; }
+    public nint Address { get; }
     public int Size { get; }
 
     public T GetValue<T>()
@@ -37,7 +37,7 @@ public sealed class MemoryObject<T> : IDisposable
 
     internal static MemoryObject<T> Allocate(IProcess process, int size)
     {
-        var address = Kernel32.VirtualAllocEx(process.Handle, IntPtr.Zero, size, MemoryAllocationFlags.Commit, MemoryProtectionFlags.ReadWrite);
+        var address = Kernel32.VirtualAllocEx(process.Handle, nint.Zero, size, MemoryAllocationFlags.Commit, MemoryProtectionFlags.ReadWrite);
         return new MemoryObject<T>(process, address, size);
     }
 }

@@ -39,7 +39,7 @@ internal sealed class ModuleManager : IModuleManager
 
             if (_process.IsCurrent)
             {
-                Ensure.Win32(Kernel32.LoadLibrary(path) != IntPtr.Zero);
+                Ensure.Win32(Kernel32.LoadLibrary(path) != nint.Zero);
             }
             else
             {
@@ -53,7 +53,7 @@ internal sealed class ModuleManager : IModuleManager
                 Ensure.That(result > 0);
             }
 
-            Ensure.Win32(Kernel32.LoadLibrary(path) != IntPtr.Zero);
+            Ensure.Win32(Kernel32.LoadLibrary(path) != nint.Zero);
             Ensure.That(TryFindByPath(path, out var module));
 
             return module!;

@@ -5,8 +5,8 @@ namespace Ion.Native;
 [StructLayout(LayoutKind.Sequential)]
 public struct MemoryBasicInformation
 {
-    public IntPtr BaseAddress;
-    public IntPtr AllocationBase;
+    public nint BaseAddress;
+    public nint AllocationBase;
     public MemoryProtectionFlags AllocationProtect;
     public long RegionSize;
     public MemoryStateFlags State;
@@ -17,8 +17,8 @@ public struct MemoryBasicInformation
 [StructLayout(LayoutKind.Sequential)]
 internal struct MemoryBasicInformation32
 {
-    public IntPtr BaseAddress;
-    public IntPtr AllocationBase;
+    public nint BaseAddress;
+    public nint AllocationBase;
     public MemoryProtectionFlags AllocationProtect;
     public int RegionSize;
     public MemoryStateFlags State;
@@ -45,8 +45,8 @@ internal struct MemoryBasicInformation32
 [StructLayout(LayoutKind.Sequential)]
 internal struct MemoryBasicInformation64
 {
-    public IntPtr BaseAddress;
-    public IntPtr AllocationBase;
+    public nint BaseAddress;
+    public nint AllocationBase;
     public MemoryProtectionFlags AllocationProtect;
     public uint Alignment1;
     public long RegionSize;
@@ -77,9 +77,9 @@ internal struct SystemInfo
     public ushort ProcessorArchitecture;
     public ushort Reserved;
     public uint PgeSize;
-    public IntPtr MinimumApplicationAddress;
-    public IntPtr MaximumApplicationAddress;
-    public IntPtr ActiveProcessorMask;
+    public nint MinimumApplicationAddress;
+    public nint MaximumApplicationAddress;
+    public nint ActiveProcessorMask;
     public uint NumberOfProcessors;
     public uint ProcessorType;
     public uint AllocationGranularity;
@@ -97,7 +97,7 @@ internal struct ProcessEntry32
     public int StructSize;
     public int Usage;
     public int ProcessId;
-    public IntPtr DefaultHeapId;
+    public nint DefaultHeapId;
     public int ModuleId;
     public int Threads;
     public int ParentProcessId;
@@ -121,9 +121,9 @@ internal struct ModuleEntry32
     public int ProcessId;
     public int GlblcntUsage;
     public int ProccntUsage;
-    public IntPtr BaseAddress;
+    public nint BaseAddress;
     public int BaseSize;
-    public IntPtr Handle;
+    public nint Handle;
 
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = ModuleNameSize)]
     public string Name;

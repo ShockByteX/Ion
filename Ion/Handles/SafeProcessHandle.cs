@@ -3,5 +3,5 @@
 public sealed class SafeProcessHandle : SafeHandle
 {
     public SafeProcessHandle() { }
-    public SafeProcessHandle(IntPtr handle) : base(handle) { }
+    public SafeProcessHandle(nint handle) : base(handle) { }
 }

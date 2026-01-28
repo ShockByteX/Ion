@@ -2,7 +2,7 @@
 
 public interface IMemoryValue<T> : IEquatable<IMemoryValue<T>>
 {
-    IntPtr Address { get; }
+    nint Address { get; }
     T Value { get; set; }
 }
 
@@ -10,13 +10,13 @@ internal sealed class MemoryValue<T> : IEquatable<MemoryValue<T>>, IMemoryValue<
 {
     private readonly IProcessMemory _memory;
 
-    public MemoryValue(IProcessMemory memory, IntPtr address)
+    public MemoryValue(IProcessMemory memory, nint address)
     {
         _memory = memory;
         Address = address;
     }
 
-    public IntPtr Address { get; }
+    public nint Address { get; }
     public T Value { get => _memory.Read<T>(Address); set => _memory.Write(Address, value); }
 
     public bool Equals(MemoryValue<T>? other) => Equals((IMemoryValue<T>?)other);

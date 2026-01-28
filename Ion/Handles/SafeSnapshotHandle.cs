@@ -3,5 +3,5 @@
 public sealed class SafeSnapshotHandle : SafeHandle
 {
     public SafeSnapshotHandle() { }
-    public SafeSnapshotHandle(IntPtr handle) : base(handle) { }
+    public SafeSnapshotHandle(nint handle) : base(handle) { }
 }

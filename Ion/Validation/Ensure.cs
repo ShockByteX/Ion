@@ -69,7 +69,7 @@ internal static class Ensure
 
     public static void Win32(bool condition, string message) => That(condition, () => new Win32Exception(message));
 
-    public static void IsValid(IntPtr handle) => ThatArgument(handle != IntPtr.Zero, "The handle is invalid", nameof(handle));
+    public static void IsValid(nint handle) => ThatArgument(handle != nint.Zero, "The handle is invalid", nameof(handle));
 
     public static void IsValid(SafeHandle handle)
     {

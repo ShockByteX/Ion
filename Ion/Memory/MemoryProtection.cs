@@ -6,7 +6,7 @@ namespace Ion.Memory;
 
 public interface IMemoryProtection : IDisposable
 {
-    IntPtr Address { get; }
+    nint Address { get; }
     int Size { get; }
     MemoryProtectionFlags Protection { get; }
     MemoryProtectionFlags OldProtection { get; }
@@ -18,7 +18,7 @@ internal sealed class MemoryProtection : IMemoryProtection
 
     private bool _disposed;
 
-    private MemoryProtection(SafeProcessHandle handle, IntPtr address, int size, MemoryProtectionFlags protection, MemoryProtectionFlags oldProtection)
+    private MemoryProtection(SafeProcessHandle handle, nint address, int size, MemoryProtectionFlags protection, MemoryProtectionFlags oldProtection)
     {
         _handle = handle;
         Address = address;
@@ -29,7 +29,7 @@ internal sealed class MemoryProtection : IMemoryProtection
 
     ~MemoryProtection() => Dispose();
 
-    public IntPtr Address { get; }
+    public nint Address { get; }
     public int Size { get; }
     public MemoryProtectionFlags Protection { get; }
     public MemoryProtectionFlags OldProtection { get; }
@@ -50,7 +50,7 @@ internal sealed class MemoryProtection : IMemoryProtection
 
     public override string ToString() => $"BaseAddress: 0x{Address.ToInt64():X}, Protection: {Protection}, OldProtection: {OldProtection}";
 
-    public static IMemoryProtection Change(SafeProcessHandle handle, IntPtr address, int size, MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
+    public static IMemoryProtection Change(SafeProcessHandle handle, nint address, int size, MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);

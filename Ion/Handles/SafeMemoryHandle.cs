@@ -3,5 +3,5 @@
 internal sealed class SafeMemoryHandle : SafeHandle
 {
     public SafeMemoryHandle() { }
-    public SafeMemoryHandle(IntPtr handle) : base(handle) { }
+    public SafeMemoryHandle(nint handle) : base(handle) { }
 }

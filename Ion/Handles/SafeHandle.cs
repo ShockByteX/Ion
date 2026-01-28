@@ -7,13 +7,13 @@ public abstract class SafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 {
     protected SafeHandle() : base(true) { }
 
-    protected SafeHandle(IntPtr handle) : base(true)
+    protected SafeHandle(nint handle) : base(true)
     {
         SetHandle(handle);
     }
 
     protected override bool ReleaseHandle()
     {
-        return handle != IntPtr.Zero && Kernel32.CloseHandle(handle);
+        return handle != nint.Zero && Kernel32.CloseHandle(handle);
     }
 }

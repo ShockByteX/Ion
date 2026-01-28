@@ -13,7 +13,7 @@ public interface IMemoryRegion : IEquatable<IMemoryRegion>, IMemoryPointer
     bool IsGuarded { get; }
     bool IsOperableGuarded { get; }
 
-    bool IsInRange(IntPtr address);
+    bool IsInRange(nint address);
     bool IsInRange(long address);
 
     IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite);
@@ -22,7 +22,7 @@ public interface IMemoryRegion : IEquatable<IMemoryRegion>, IMemoryPointer
 
 internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRegion
 {
-    public MemoryRegion(IProcessMemory memory, IntPtr address) : base(memory, address) { }
+    public MemoryRegion(IProcessMemory memory, nint address) : base(memory, address) { }
 
     public MemoryBasicInformation Information
     {
@@ -56,7 +56,7 @@ internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRe
     public bool IsGuarded => Information.MemoryProtection.HasFlag(MemoryProtectionFlags.Guard);
     public bool IsOperableGuarded => (IsReadable | IsWritable | IsExecutable) && IsGuarded;
 
-    public bool IsInRange(IntPtr address) => IsInRange(address.ToInt64());
+    public bool IsInRange(nint address) => IsInRange(address.ToInt64());
 
     public bool IsInRange(long address)
     {
@@ -72,7 +72,7 @@ internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRe
     public void Release()
     {
         Memory.Process.Handle.ReleaseMemoryPage(Address);
-        Address = IntPtr.Zero;
+        Address = nint.Zero;
     }
 
     public bool Equals(MemoryRegion? other) => Equals((IMemoryRegion?)other);

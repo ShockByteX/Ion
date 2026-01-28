@@ -9,14 +9,14 @@ namespace Ion.Modules;
 
 public interface IProcessFunction : IEquatable<IProcessFunction>
 {
-    IntPtr Address { get; }
+    nint Address { get; }
     string Name { get; }
     T GetDelegate<T>();
-    int Execute(IntPtr parameterPointer);
+    int Execute(nint parameterPointer);
     int Execute(string parameter, Encoding encoding);
 }
 
-internal sealed class ProcessFunction(IProcess process, IntPtr address, string name) 
+internal sealed class ProcessFunction(IProcess process, nint address, string name) 
     : MemoryPointer(process.Memory, address), IEquatable<ProcessFunction>, IProcessFunction
 {
     public string Name { get; } = name;
@@ -28,7 +28,7 @@ internal sealed class ProcessFunction(IProcess process, IntPtr address, string n
         return Marshal.GetDelegateForFunctionPointer<T>(Address);
     }
 
-    public int Execute(IntPtr parameterPointer)
+    public int Execute(nint parameterPointer)
     {
         using var thread = process.CreateThread(Address, parameterPointer, ThreadCreationFlags.ThreadCreateRunImmediately);
         return thread.Wait();

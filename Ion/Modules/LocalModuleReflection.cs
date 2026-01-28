@@ -20,7 +20,7 @@ internal sealed class LocalModuleReflection : IDisposable
     {
         var address = Kernel32.GetProcAddress(_localModule.BaseAddress, functionName);
 
-        Ensure.Win32(address != IntPtr.Zero);
+        Ensure.Win32(address != nint.Zero);
 
         var offset = (int)(address.ToInt64() - _localModule.BaseAddress.ToInt64());
 

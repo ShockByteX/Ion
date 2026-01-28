@@ -8,48 +8,48 @@ internal unsafe partial class Kernel32
     public const string LibraryName = "kernel32.dll";
 
     [DllImport(LibraryName, CharSet = CharSet.Auto, SetLastError = true)]
-    public static extern IntPtr GetModuleHandle(string lpModuleName);
+    public static extern nint GetModuleHandle(string lpModuleName);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
     public static extern SafeProcessHandle OpenProcess(ProcessAccessFlags dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, int dwProcessId);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool CloseHandle(IntPtr hObject);
+    public static extern bool CloseHandle(nint hObject);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool DuplicateHandle(IntPtr hSourceProcessHandle, IntPtr hSourceHandle, IntPtr hTargetProcessHandle, out IntPtr lpTargetHandle, uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
+    public static extern bool DuplicateHandle(nint hSourceProcessHandle, nint hSourceHandle, nint hTargetProcessHandle, out nint lpTargetHandle, uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
 
     [DllImport(LibraryName, SetLastError = true, CharSet = CharSet.Ansi)]
-    public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
+    public static extern nint GetProcAddress(nint hModule, string procName);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
-    public static extern bool VirtualProtectEx(SafeProcessHandle hProcess, IntPtr lpAddress, int dwSize, MemoryProtectionFlags flNewProtect, out MemoryProtectionFlags lpflOldProtect);
+    public static extern bool VirtualProtectEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryProtectionFlags flNewProtect, out MemoryProtectionFlags lpflOldProtect);
 
     [DllImport(LibraryName, EntryPoint = "VirtualQueryEx", SetLastError = true)]
-    public static extern int VirtualQueryEx32(SafeProcessHandle hProcess, IntPtr lpAddress, out MemoryBasicInformation32 lpBuffer, int dwLength);
+    public static extern int VirtualQueryEx32(SafeProcessHandle hProcess, nint lpAddress, out MemoryBasicInformation32 lpBuffer, int dwLength);
 
     [DllImport(LibraryName, EntryPoint = "VirtualQueryEx", SetLastError = true)]
-    public static extern int VirtualQueryEx64(SafeProcessHandle hProcess, IntPtr lpAddress, out MemoryBasicInformation64 lpBuffer, int dwLength);
+    public static extern int VirtualQueryEx64(SafeProcessHandle hProcess, nint lpAddress, out MemoryBasicInformation64 lpBuffer, int dwLength);
 
     [DllImport(LibraryName, SetLastError = true)]
-    public static extern IntPtr VirtualAllocEx(SafeProcessHandle hProcess, IntPtr lpAddress, int dwSize, MemoryAllocationFlags flAllocationType, MemoryProtectionFlags flProtect);
+    public static extern nint VirtualAllocEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryAllocationFlags flAllocationType, MemoryProtectionFlags flProtect);
 
     [DllImport(LibraryName, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool VirtualFreeEx(SafeProcessHandle hProcess, IntPtr lpAddress, int dwSize, MemoryReleaseFlags dwFreeType);
+    public static extern bool VirtualFreeEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryReleaseFlags dwFreeType);
 
     [DllImport(LibraryName, EntryPoint = "RtlMoveMemory", SetLastError = true)]
     public static extern void MoveMemory(void* dest, void* src, int size);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ReadProcessMemory(SafeProcessHandle hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
+    public static extern bool ReadProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
 
     [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool WriteProcessMemory(SafeProcessHandle hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int nSize, out int lpNumberOfBytesWritten);
+    public static extern bool WriteProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, byte[] lpBuffer, int nSize, out int lpNumberOfBytesWritten);
 
     [DllImport(LibraryName, SetLastError = true)]
     public static extern void GetSystemInfo(out SystemInfo lpSystemInfo);
@@ -70,26 +70,26 @@ internal unsafe partial class Kernel32
     public static extern bool Module32Next(SafeSnapshotHandle handle, ref ModuleEntry32 entry);
 
     [DllImport(LibraryName, SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern IntPtr LoadLibrary(string lpFileName);
+    public static extern nint LoadLibrary(string lpFileName);
 
     [DllImport(LibraryName, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool FreeLibrary(IntPtr hModule);
+    public static extern bool FreeLibrary(nint hModule);
 
     [DllImport(LibraryName)]
-    public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, int dwThreadId);
+    public static extern nint OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, int dwThreadId);
 
     [DllImport(LibraryName)]
-    public static extern uint SuspendThread(IntPtr hThread);
+    public static extern uint SuspendThread(nint hThread);
 
     [DllImport(LibraryName)]
-    public static extern int ResumeThread(IntPtr hThread);
+    public static extern int ResumeThread(nint hThread);
 
-    public static int VirtualQueryEx(SafeProcessHandle hProcess, IntPtr lpAddress, out MemoryBasicInformation lpBuffer)
+    public static int VirtualQueryEx(SafeProcessHandle hProcess, nint lpAddress, out MemoryBasicInformation lpBuffer)
     {
         int result;
 
-        switch (IntPtr.Size)
+        switch (nint.Size)
         {
             case 4:
                 result = VirtualQueryEx32(hProcess, lpAddress, out var memoryInfo32, MemoryBasicInformation32.StructSize);

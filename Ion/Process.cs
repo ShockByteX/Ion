@@ -21,13 +21,13 @@ public interface IProcess
 
     IReadOnlyList<IProcessModule> Modules { get; }
 
-    IMemoryPointer this[IntPtr address] { get; }
+    IMemoryPointer this[nint address] { get; }
     IProcessModule this[string moduleName] { get; }
 
     MemoryObject<T> AllocateObject<T>();
     IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection);
-    IProcessThreadDisposable CreateThread(IntPtr functionPointer, IntPtr parameterPointer, ThreadCreationFlags flags);
-    IntPtr ScanFirst(string pattern);
+    IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags);
+    nint ScanFirst(string pattern);
     IReadOnlyCollection<IMemoryRegion> GetMemoryRegions();
 }
 
@@ -60,18 +60,18 @@ public sealed class ExtendedProcess : IProcessDisposable
 
     public IReadOnlyList<IProcessModule> Modules => ModuleManager.Modules;
 
-    public IMemoryPointer this[IntPtr address] => new MemoryPointer(Memory, address);
+    public IMemoryPointer this[nint address] => new MemoryPointer(Memory, address);
     public IProcessModule this[string moduleName] => ModuleManager[moduleName];
 
     public MemoryObject<T> AllocateObject<T>() => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
     public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
 
-    public IProcessThreadDisposable CreateThread(IntPtr functionPointer, IntPtr parameterPointer, ThreadCreationFlags flags)
+    public IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags)
     {
         return ProcessThread.Create(Handle, functionPointer, parameterPointer, flags);
     }
 
-    public IntPtr ScanFirst(string pattern)
+    public nint ScanFirst(string pattern)
     {
         foreach (var module in Modules)
         {
@@ -84,13 +84,13 @@ public sealed class ExtendedProcess : IProcessDisposable
             }
         }
 
-        return IntPtr.Zero;
+        return nint.Zero;
     }
 
     public IReadOnlyCollection<IMemoryRegion> GetMemoryRegions()
     {
         Kernel32.GetSystemInfo(out var systemInfo);
-        return Memory.GetMemoryRegions(IntPtr.Zero, systemInfo.MaximumApplicationAddress);
+        return Memory.GetMemoryRegions(nint.Zero, systemInfo.MaximumApplicationAddress);
     }
 
     public void Dispose()

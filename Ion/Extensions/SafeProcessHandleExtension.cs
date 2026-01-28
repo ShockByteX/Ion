@@ -9,7 +9,7 @@ namespace Ion.Extensions;
 
 internal static class SafeProcessHandleExtension
 {
-    public static byte[] ReadMemory(this SafeProcessHandle handle, IntPtr address, int length)
+    public static byte[] ReadMemory(this SafeProcessHandle handle, nint address, int length)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
@@ -22,7 +22,7 @@ internal static class SafeProcessHandleExtension
         return data;
     }
 
-    public static int WriteMemory(this SafeProcessHandle handle, IntPtr address, byte[] data)
+    public static int WriteMemory(this SafeProcessHandle handle, nint address, byte[] data)
     {
         return handle.WriteMemoryProtected(address, data.Length, () =>
         {
@@ -31,7 +31,7 @@ internal static class SafeProcessHandleExtension
         });
     }
 
-    public static int WriteMemoryProtected(this SafeProcessHandle handle, IntPtr address, int length, Action write)
+    public static int WriteMemoryProtected(this SafeProcessHandle handle, nint address, int length, Action write)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
@@ -56,14 +56,14 @@ internal static class SafeProcessHandleExtension
         }
     }
 
-    public static MemoryProtectionFlags GetMemoryProtection(this SafeProcessHandle handle, IntPtr address)
+    public static MemoryProtectionFlags GetMemoryProtection(this SafeProcessHandle handle, nint address)
     {
         Ensure.Win32(Query(handle, address, out var memoryInfo) > 0);
 
         return memoryInfo.MemoryProtection;
     }
 
-    public static int Query(this SafeProcessHandle handle, IntPtr address, out MemoryBasicInformation memoryInfo)
+    public static int Query(this SafeProcessHandle handle, nint address, out MemoryBasicInformation memoryInfo)
     {
         Ensure.IsValid(handle);
 
@@ -72,14 +72,14 @@ internal static class SafeProcessHandleExtension
         return result;
     }
 
-    public static void ReleaseMemoryPage(this SafeProcessHandle handle, IntPtr address)
+    public static void ReleaseMemoryPage(this SafeProcessHandle handle, nint address)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
         Ensure.Win32(Kernel32.VirtualFreeEx(handle, address, 0, MemoryReleaseFlags.Release), string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
     }
 
-    public static void ReleaseMemoryPage(this SafeProcessHandle handle, IntPtr address, int size)
+    public static void ReleaseMemoryPage(this SafeProcessHandle handle, nint address, int size)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);

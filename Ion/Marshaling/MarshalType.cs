@@ -59,7 +59,7 @@ public static class MarshalType
         {
             fixed (byte* pData = data)
             {
-                Marshal.StructureToPtr(value, (IntPtr)pData, false);
+                Marshal.StructureToPtr(value, (nint)pData, false);
             }
         }
 
@@ -92,7 +92,7 @@ public static class MarshalType
         {
             fixed (byte* pData = data.Span)
             {
-                return Ensure.NotNull(Marshal.PtrToStructure((IntPtr)pData, type));
+                return Ensure.NotNull(Marshal.PtrToStructure((nint)pData, type));
             }
         }
     }

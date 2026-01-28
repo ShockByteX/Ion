@@ -11,12 +11,12 @@ public sealed class Detour : IDisposable
     private readonly IProcess _process;
     private readonly byte[] _originalData;
     private readonly byte[] _injectedData;
-    private readonly IntPtr _caveAddress;
+    private readonly nint _caveAddress;
     private readonly int _caveLength;
 
     private bool _isActive;
 
-    public Detour(IProcess process, IntPtr address, byte[] originalData, byte[] injectedData, IntPtr caveAddress, int caveLength)
+    public Detour(IProcess process, nint address, byte[] originalData, byte[] injectedData, nint caveAddress, int caveLength)
     {
         _process = process;
         _originalData = originalData;
@@ -29,8 +29,8 @@ public sealed class Detour : IDisposable
     }
 
     public bool IsActive { get => _isActive; set => SetState(value); }
-    public IntPtr Address { get; private set; }
-    public IntPtr AdditionalAddress { get; }
+    public nint Address { get; private set; }
+    public nint AdditionalAddress { get; }
 
     private void SetState(bool state)
     {
@@ -44,11 +44,11 @@ public sealed class Detour : IDisposable
     public void Dispose()
     {
         IsActive = false;
-        Address = IntPtr.Zero;
+        Address = nint.Zero;
         _process[_caveAddress].Write(0, Enumerable.Range(0, _caveLength).Select(_ => (byte)0).ToArray());
     }
 
-    public static Detour Create(IProcess process, IntPtr address, IntPtr caveAddress, byte[] caveData, int sourceLength, int entryPointOffset = 0)
+    public static Detour Create(IProcess process, nint address, nint caveAddress, byte[] caveData, int sourceLength, int entryPointOffset = 0)
     {
         var caveLength = caveData.Length;
         var originalData = process[address].Read(0, sourceLength);
@@ -61,7 +61,7 @@ public sealed class Detour : IDisposable
         return new Detour(process, address, originalData, injectedData, caveAddress, caveLength);
     }
 
-    public static IntPtr FindCodeCave(IProcess process, IntPtr address, int size)
+    public static nint FindCodeCave(IProcess process, nint address, int size)
     {
         var module = process.Modules[0];
         var data = process[address].Read(0, (int)(module.BaseAddress.ToInt64() + module.Size - address.ToInt64()));
@@ -71,7 +71,7 @@ public sealed class Detour : IDisposable
         return address + offset;
     }
 
-    private static IEnumerable<byte> EvaluateJumpBytes(IntPtr sourceAddress, IntPtr targetAddress)
+    private static IEnumerable<byte> EvaluateJumpBytes(nint sourceAddress, nint targetAddress)
     {
         var operand = (int)(targetAddress.ToInt64() - sourceAddress.ToInt64());
         var operandData = BitConverter.GetBytes(operand);
