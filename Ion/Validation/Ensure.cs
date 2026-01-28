@@ -6,37 +6,45 @@ using Ion.Properties;
 
 namespace Ion.Validation;
 
+internal sealed class InvariantViolationException : InvalidOperationException
+{
+    public InvariantViolationException() { }
+    public InvariantViolationException(string? message) : base(message) { }
+    public InvariantViolationException(string? message, Exception? innerException) : base(message, innerException) { }
+}
+
 internal static class Ensure
 {
+    [DoesNotReturn]
     public static void Throw<TException>() where TException : Exception, new() => throw new TException();
 
-    public static void That<TException>(bool condition) where TException : Exception, new()
+    public static void That<TException>([DoesNotReturnIf(false)] bool condition) where TException : Exception, new()
     {
         if (!condition)
-        {
             Throw<TException>();
-        }
     }
 
-    public static void That(bool condition, Func<Exception> getException)
+    public static void That([DoesNotReturnIf(false)] bool condition, Func<Exception> getException)
     {
         if (!condition)
-        {
             throw getException();
-        }
     }
 
-    public static void That(bool condition) => That<Exception>(condition);
+    public static void That([DoesNotReturnIf(false)] bool condition, Func<string> getMessage)
+    {
+        if (!condition)
+            throw new InvalidOperationException(getMessage());
+    }
+
+    public static void That(bool condition) => That<InvariantViolationException>(condition);
     public static void ThatArgument(bool condition, string message, [CallerMemberName] string? parameterName = null) => That(condition, () => new ArgumentException(message, parameterName));
 
-    public static T NotNull<T>([NotNull] T? value, [CallerMemberName] string? parameterName = null)
+    public static T NotNull<T>([NotNull] T? value, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
-        return value is null
-            ? throw new ArgumentNullException(parameterName, string.Format(Resources.ErrorValueCannotBeNull, parameterName))
-            : value;
+        return value ?? throw new ArgumentNullException(parameterName);
     }
 
-    public static string NotNullOrEmpty(string? value, [CallerMemberName] string? parameterName = null)
+    public static string NotNullOrEmpty(string? value, [CallerArgumentExpression(nameof(value))] string? parameterName = null)
     {
         return string.IsNullOrEmpty(value)
             ? throw new ArgumentNullException(parameterName, string.Format(Resources.ErrorValueCannotBeNullOrEmpty, parameterName))
@@ -46,25 +54,19 @@ internal static class Ensure
     public static void FileExists(string path)
     {
         if (!File.Exists(path))
-        {
             throw new FileNotFoundException($"File not found: {path}", path);
-        }
     }
 
     public static void OutOfRange(int value, int min, int max, string parameterName)
     {
         if (value < min || value > max)
-        {
             throw new ArgumentOutOfRangeException(parameterName);
-        }
     }
 
     public static void Win32(bool condition)
     {
         if (!condition)
-        {
             Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
-        }
     }
 
     public static void Win32(bool condition, string message) => That(condition, () => new Win32Exception(message));

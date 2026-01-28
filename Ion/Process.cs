@@ -76,12 +76,10 @@ public sealed class ExtendedProcess : IProcessDisposable
         foreach (var module in Modules)
         {
             var data = this[module.BaseAddress].Read(0, module.Size);
-            var result = SignatureScanner.Scan(data, pattern, 0, true);
+            var result = SignatureScanner.ScanFirst(data, pattern, 0);
 
-            if (result.Count > 0)
-            {
-                return module.BaseAddress.Add(result[0]);
-            }
+            if (SignatureScanner.TryScan(data, pattern, out var offset))
+                module.BaseAddress.Add(offset);
         }
 
         return nint.Zero;

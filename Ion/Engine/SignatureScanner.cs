@@ -1,53 +1,117 @@
-﻿namespace Ion.Engine;
+﻿using Ion.Validation;
+
+namespace Ion.Engine;
 
 public static unsafe class SignatureScanner
 {
-    public static IReadOnlyList<int> Scan(byte[] data, string pattern, int startOffset = 0) => Scan(data, pattern, startOffset, firstOnly: false);
-    public static int ScanFirst(byte[] data, string pattern, int startOffset = 0) => Scan(data, pattern, startOffset, firstOnly: true).Single();
+    public static IReadOnlyList<int> Scan(byte[] data, string pattern, int from = 0) => Scan(data, Signature.Parse(pattern), from, firstOnly: false);
+    public static IReadOnlyList<int> Scan(byte[] data, byte[] pattern, int from = 0) => Scan(data, Signature.Create(pattern), from, firstOnly: false);
 
-    public static IReadOnlyList<int> Scan(byte[] data, string pattern, int startOffset, bool firstOnly)
+    public static int ScanFirst(byte[] data, string pattern, int from = 0) => Scan(data, Signature.Parse(pattern), from, firstOnly: true).Single();
+    public static int ScanFirst(byte[] data, byte[] pattern, int from = 0) => Scan(data, Signature.Create(pattern), from, firstOnly: true).Single();
+
+    public static bool TryScan(byte[] data, string pattern, out int offset)
     {
-        var signature = BytesConverter.ToBytes(pattern, out var unknownByte);
-        return Scan(data, signature, unknownByte, startOffset, firstOnly);
+        var signature = Signature.Parse(pattern);
+
+        offset = Scan(data, signature, firstOnly: true).FirstOrDefault(-1);
+
+        return offset > -1;
     }
 
-    public static int ScanFirst(byte[] data, byte[] signature, byte unknownByte) => Scan(data, signature, unknownByte).Single();
-
-    public static IReadOnlyList<int> Scan(byte[] data, byte[] signature, byte unknownByte, int startOffset = 0, bool firstOnly = true)
+    private static IReadOnlyList<int> Scan(byte[] data, Signature signature, int from = 0, bool firstOnly = true)
     {
-        var endPoint = data.Length - signature.Length - 1;
-        var sigByte = signature[0];
-        var sigLength = signature.Length;
+        var pattern = signature.Pattern;
 
-        var offsets = new List<int>();
+        var to = data.Length - pattern.Length;
+        var offsets = firstOnly ? null : new List<int>();
 
-        fixed (byte* ptrData = data, ptrSignature = signature)
+        fixed (byte* pData = data, pPattern = pattern)
         {
-            for (var i = startOffset; i < endPoint; i++)
+            for (var i = from; i <= to; i++)
             {
-                if (!sigByte.Equals(ptrData[i])) continue;
-                if (!SequenceEquals(ptrData, ptrSignature, unknownByte, i, sigLength)) continue;
-
-                offsets.Add(i);
+                if (!SequenceEquals(pData + i, pPattern, pattern.Length, signature.Wildcard)) continue;
 
                 if (firstOnly)
-                {
-                    return offsets;
-                }
+                    return [i];
+
+                offsets!.Add(i);
             }
         }
 
-        return offsets;
+        return offsets ?? (IReadOnlyList<int>)[];
     }
 
-    private static bool SequenceEquals(byte* ptrData, byte* ptrSignature, byte unknownByte, int index, int length)
+    private static bool SequenceEquals(byte* data, byte* pattern, int length, byte wildcard)
     {
         for (var i = 0; i < length; i++)
         {
-            if (ptrSignature[i] == unknownByte) continue;
-            if (ptrSignature[i] != ptrData[index + i]) return false;
+            if (pattern[i] != wildcard && pattern[i] != data[i])
+                return false;
         }
 
         return true;
+    }
+
+    public readonly struct Signature
+    {
+        private const char Delimiter = ' ';
+        private const char Unknown = '?';
+
+        private Signature(byte[] pattern, byte wildcard)
+        {
+            Pattern = pattern;
+            Wildcard = wildcard;
+        }
+
+        public readonly byte[] Pattern;
+        public readonly byte Wildcard;
+
+        public static Signature Parse(string pattern)
+        {
+            var parts = pattern.Split(Delimiter, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var wildcard = FindWildcard(parts);
+            var compiledPattern = new byte[parts.Length];
+
+            for (var i = 0; i < compiledPattern.Length; i++)
+            {
+                var part = parts[i];
+
+                compiledPattern[i] = IsWildcard(part)
+                    ? wildcard
+                    : Convert.ToByte(part, 16);
+            }
+
+            return new Signature(compiledPattern, wildcard);
+        }
+
+        public static Signature Create(byte[] pattern)
+        {
+            var knownBytes = new bool[256];
+
+            for (var i = 0; i < pattern.Length; i++)
+                knownBytes[pattern[i]] = true;
+
+            var wildcard = Array.IndexOf(knownBytes, false);
+
+            Ensure.That(wildcard != -1, () => "Cannot create signature from pattern with all possible byte values.");
+
+            return new Signature(pattern, (byte)wildcard);
+        }
+
+        private static byte FindWildcard(string[] parts)
+        {
+            var knownBytes = new bool[256];
+
+            foreach (var part in parts)
+            {
+                if (!IsWildcard(part))
+                    knownBytes[Convert.ToByte(part, 16)] = true;
+            }
+
+            return (byte)Array.IndexOf(knownBytes, false);
+        }
+
+        private static bool IsWildcard(string part) => part.Length is 1 && part[0] == Unknown;
     }
 }

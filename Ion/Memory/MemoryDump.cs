@@ -5,9 +5,7 @@ namespace Ion.Memory;
 public interface IMemoryDump
 {
     public nint Address { get; }
-
     byte[] GetData();
-    int ScanFirst(byte[] signature, byte unknownByte, int offset, int extra, bool relative);
     int ScanFirst(string pattern, int offset, int extra, bool relative, int startOffset = 0);
 }
 
@@ -26,19 +24,6 @@ internal sealed class MemoryDump : IMemoryDump
     public nint Address { get; }
 
     public byte[] GetData() => _data.ToArray();
-
-    public int ScanFirst(byte[] signature, byte unknownByte, int offset, int extra, bool relative)
-    {
-        var result = SignatureScanner.ScanFirst(_data, signature, unknownByte);
-        var address = nint.Add(Address, result + offset);
-
-        if (relative)
-        {
-            address = _process[address].Read<nint>(0);
-        }
-
-        return address.ToInt32() + extra;
-    }
 
     public int ScanFirst(string pattern, int offset, int extra, bool relative, int startOffset = 0)
     {
