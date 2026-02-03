@@ -1,4 +1,4 @@
-﻿namespace Ion.Handles;
+﻿namespace Ion.Interop.Handles;
 
 internal sealed class SafeMemoryHandle : SafeHandle
 {

@@ -1,4 +1,4 @@
-﻿namespace Ion.Native;
+﻿namespace Ion.Interop;
 
 [Flags]
 public enum ProcessAccessFlags

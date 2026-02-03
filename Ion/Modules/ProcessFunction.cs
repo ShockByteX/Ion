@@ -2,7 +2,7 @@
 using Ion.Memory;
 using Ion.Extensions;
 using Ion.Validation;
-using Ion.Native;
+using Ion.Interop;
 using System.Text;
 
 namespace Ion.Modules;

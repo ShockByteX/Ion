@@ -1,4 +1,4 @@
-﻿namespace Ion.Native.Snapshot;
+﻿namespace Ion.Interop.Snapshot;
 
 internal sealed class ModelSnapshot<TModel, TEntity> : Toolhelp32Snapshot<TEntity> where TEntity : struct
 {

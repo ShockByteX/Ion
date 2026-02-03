@@ -1,12 +1,12 @@
 ﻿using Ion.Engine;
-using Ion.Handles;
 using Ion.Marshaling;
 using Ion.Memory;
 using Ion.Modules;
-using Ion.Native;
+using Ion.Interop;
 using Ion.Extensions;
 using Ion.Validation;
 using Ion.Threading;
+using Ion.Interop.Handles;
 
 namespace Ion;
 
@@ -24,7 +24,7 @@ public interface IProcess
     IMemoryPointer this[nint address] { get; }
     IProcessModule this[string moduleName] { get; }
 
-    MemoryObject<T> AllocateObject<T>();
+    MemoryObject<T> AllocateObject<T>() where T : struct;
     IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection);
     IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags);
     nint ScanFirst(string pattern);
@@ -63,7 +63,7 @@ public sealed class ExtendedProcess : IProcessDisposable
     public IMemoryPointer this[nint address] => new MemoryPointer(Memory, address);
     public IProcessModule this[string moduleName] => ModuleManager[moduleName];
 
-    public MemoryObject<T> AllocateObject<T>() => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
+    public MemoryObject<T> AllocateObject<T>() where T : struct => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
     public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
 
     public IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags)

@@ -1,7 +1,7 @@
 ﻿using Ion.Exceptions;
 using Ion.Extensions;
 using Ion.Memory;
-using Ion.Native;
+using Ion.Interop;
 using Ion.Validation;
 
 namespace Ion.Modules;

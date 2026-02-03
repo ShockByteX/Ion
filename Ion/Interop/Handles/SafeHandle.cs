@@ -1,7 +1,7 @@
-﻿using Ion.Native;
+﻿using Ion.Interop;
 using Microsoft.Win32.SafeHandles;
 
-namespace Ion.Handles;
+namespace Ion.Interop.Handles;
 
 public abstract class SafeHandle : SafeHandleZeroOrMinusOneIsInvalid
 {

@@ -1,9 +1,9 @@
-﻿using Ion.Handles;
+﻿using Ion.Interop.Handles;
 using System.Runtime.InteropServices;
 
-using SafeHandle = Ion.Handles.SafeHandle;
+using SafeHandle = Ion.Interop.Handles.SafeHandle;
 
-namespace Ion.Native;
+namespace Ion.Interop;
 
 internal partial class Kernel32
 {

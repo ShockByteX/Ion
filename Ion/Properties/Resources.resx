@@ -121,7 +121,7 @@
     <value>Failed to find function: {0} (ProcessId: {1}, ProcessName: {2}, ModulePath: {3})</value>
   </data>
   <data name="ErrorFailedToFindModule" xml:space="preserve">
-    <value>Failed to find process-module: {0} (ProcessId: {1}, ProcessName: {2})</value>
+    <value>Failed to find process module: {0} (ProcessId: {1}, ProcessName: {2})</value>
   </data>
   <data name="ErrorFailedToFindProcess" xml:space="preserve">
     <value>Failed to find process: {0}</value>
@@ -139,9 +139,9 @@
     <value>Failed to write to: 0x{0}</value>
   </data>
   <data name="ErrorValueCannotBeNullOrEmpty" xml:space="preserve">
-	  <value>Value cannot be null or empty ({0})</value>
+    <value>Value cannot be null or empty ({0})</value>
   </data>
   <data name="ErrorValueCannotBeNull" xml:space="preserve">
-	  <value>Value cannot be null ({0})</value>
+    <value>Value cannot be null ({0})</value>
   </data>
 </root>

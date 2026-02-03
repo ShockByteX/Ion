@@ -17,7 +17,7 @@ internal class PortableExecutableBinary
 
     public byte[] Read(int offset, int length) => _data[offset..(offset + length)];
 
-    public T Read<T>(int offset) where T : struct => MarshalType<T>.Convert(Read(offset, MarshalType<T>.Size));
+    public T Read<T>(int offset) where T : struct => MarshalType<T>.ToValue(Read(offset, MarshalType<T>.Size));
 
     public string Read(int offset, Encoding encoding, int maxLength)
     {

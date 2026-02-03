@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Ion.Native;
+namespace Ion.Interop;
 
 internal static class Psapi
 {

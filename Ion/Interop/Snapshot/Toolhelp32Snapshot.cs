@@ -1,7 +1,7 @@
-﻿using Ion.Handles;
+﻿using Ion.Interop.Handles;
 using Ion.Validation;
 
-namespace Ion.Native.Snapshot;
+namespace Ion.Interop.Snapshot;
 
 internal abstract class Toolhelp32Snapshot<TEntity> where TEntity : struct
 {

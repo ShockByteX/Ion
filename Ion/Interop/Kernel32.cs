@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using Ion.Handles;
+using Ion.Interop.Handles;
 
-namespace Ion.Native;
+namespace Ion.Interop;
 
 internal unsafe partial class Kernel32
 {

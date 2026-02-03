@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Ion.Handles;
 using Ion.Marshaling;
-using Ion.Native;
+using Ion.Interop;
 using Ion.Properties;
 using Ion.Validation;
+using Ion.Interop.Handles;
 
 namespace Ion.Extensions;
 
@@ -72,7 +72,7 @@ internal static class IntPtrExtension
         }
     }
 
-    public static unsafe int Write<T>(this nint address, SafeProcessHandle handle, T value)
+    public static unsafe int Write<T>(this nint address, SafeProcessHandle handle, T value) where T : struct
     {
         return handle.WriteMemoryProtected(address, MarshalType<T>.Size, () =>
         {

@@ -1,10 +1,10 @@
 ﻿using Ion.Marshaling;
-using Ion.Native;
+using Ion.Interop;
 using Ion.Validation;
 
 namespace Ion.Memory;
 
-public sealed class MemoryObject<T> : IDisposable
+public sealed class MemoryObject<T> : IDisposable where T : struct
 {
     private readonly IProcess _process;
 
@@ -18,13 +18,13 @@ public sealed class MemoryObject<T> : IDisposable
     public nint Address { get; }
     public int Size { get; }
 
-    public T GetValue<T>()
+    public T GetValue<T>() where T : struct
     {
         Ensure.That(MarshalType<T>.Size == Size);
         return _process[Address].Read<T>(0);
     }
 
-    public void SetValue<T>(T value)
+    public void SetValue<T>(T value) where T : struct
     {
         Ensure.That(MarshalType<T>.Size == Size);
         _process[Address].Write(0, value);

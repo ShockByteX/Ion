@@ -1,6 +1,6 @@
 ﻿using Ion.Exceptions;
-using Ion.Native;
-using Ion.Native.Snapshot;
+using Ion.Interop;
+using Ion.Interop.Snapshot;
 using Ion.Validation;
 using System.Diagnostics;
 using System.Text;

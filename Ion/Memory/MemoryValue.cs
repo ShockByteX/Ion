@@ -6,7 +6,7 @@ public interface IMemoryValue<T> : IEquatable<IMemoryValue<T>>
     T Value { get; set; }
 }
 
-internal sealed class MemoryValue<T> : IEquatable<MemoryValue<T>>, IMemoryValue<T>
+internal sealed class MemoryValue<T> : IEquatable<MemoryValue<T>>, IMemoryValue<T> where T : struct
 {
     private readonly IProcessMemory _memory;
 

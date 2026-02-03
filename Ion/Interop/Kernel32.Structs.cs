@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Ion.Native;
+namespace Ion.Interop;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct MemoryBasicInformation

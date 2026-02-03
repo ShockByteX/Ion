@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Ion.Extensions;
 using Ion.Marshaling;
-using Ion.Native;
+using Ion.Interop;
 
 namespace Ion.Memory;
 
@@ -12,14 +12,14 @@ public interface IProcessMemory
     IReadOnlyCollection<IMemoryRegion> GetMemoryRegions(nint minAddress, nint maxAddress);
 
     byte[] Read(nint address, int length);
-    T Read<T>(nint address);
-    T[] Read<T>(nint address, int length);
+    T Read<T>(nint address) where T : struct;
+    T[] Read<T>(nint address, int length) where T : struct;
     string Read(nint address, Encoding encoding, int maxLength);
     string Read(nint address, Encoding encoding);
 
     int Write(nint address, byte[] data);
-    void Write<T>(nint address, T value);
-    void Write<T>(nint address, T[] values);
+    void Write<T>(nint address, T value) where T : struct;
+    void Write<T>(nint address, T[] values) where T : struct;
     void Write(nint address, string text, Encoding encoding);
 }
 
@@ -48,7 +48,7 @@ public abstract class ProcessMemory : IProcessMemory
         return regions;
     }
 
-    public T[] Read<T>(nint address, int length)
+    public T[] Read<T>(nint address, int length) where T : struct
     {
         var values = new T[length];
         var size = MarshalType<T>.Size;
@@ -84,7 +84,7 @@ public abstract class ProcessMemory : IProcessMemory
         return ntIndex != -1 ? text.Remove(ntIndex) : text;
     }
 
-    public void Write<T>(nint address, T[] values)
+    public void Write<T>(nint address, T[] values) where T : struct
     {
         var length = values.Length;
         var size = MarshalType<T>.Size;
@@ -106,7 +106,7 @@ public abstract class ProcessMemory : IProcessMemory
     }
 
     public abstract byte[] Read(nint address, int length);
-    public abstract T Read<T>(nint address);
+    public abstract T Read<T>(nint address) where T : struct;
     public abstract int Write(nint address, byte[] data);
-    public abstract void Write<T>(nint address, T value);
+    public abstract void Write<T>(nint address, T value) where T : struct;
 }

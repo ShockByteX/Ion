@@ -1,4 +1,4 @@
-﻿namespace Ion.Handles;
+﻿namespace Ion.Interop.Handles;
 
 public sealed class SafeProcessHandle : SafeHandle
 {

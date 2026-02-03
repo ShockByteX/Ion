@@ -1,4 +1,4 @@
-﻿using Ion.Native;
+﻿using Ion.Interop;
 using Ion.Extensions;
 
 namespace Ion.Memory;

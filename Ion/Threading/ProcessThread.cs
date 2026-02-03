@@ -1,5 +1,5 @@
-﻿using Ion.Handles;
-using Ion.Native;
+﻿using Ion.Interop;
+using Ion.Interop.Handles;
 using Ion.Validation;
 using System.ComponentModel;
 using System.Runtime.InteropServices;

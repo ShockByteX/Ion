@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
-using Ion.Handles;
 using Ion.Memory;
-using Ion.Native;
+using Ion.Interop;
 using Ion.Properties;
 using Ion.Validation;
+using Ion.Interop.Handles;
 
 namespace Ion.Extensions;
 
