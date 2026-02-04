@@ -7,25 +7,25 @@ public struct MemoryBasicInformation
 {
     public nint BaseAddress;
     public nint AllocationBase;
-    public MemoryProtectionFlags AllocationProtect;
+    public PageProtectionFlags AllocationProtect;
     public long RegionSize;
     public MemoryStateFlags State;
-    public MemoryProtectionFlags MemoryProtection;
+    public PageProtectionFlags MemoryProtection;
     public MemoryTypeFlags Type;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct MemoryBasicInformation32
+internal unsafe struct MemoryBasicInformation32
 {
     public nint BaseAddress;
     public nint AllocationBase;
-    public MemoryProtectionFlags AllocationProtect;
+    public PageProtectionFlags AllocationProtect;
     public int RegionSize;
     public MemoryStateFlags State;
-    public MemoryProtectionFlags MemoryProtection;
+    public PageProtectionFlags MemoryProtection;
     public MemoryTypeFlags Type;
 
-    public static readonly int StructSize = Marshal.SizeOf(typeof(MemoryBasicInformation32));
+    public static readonly int StructSize = sizeof(MemoryBasicInformation32);
 
     public static implicit operator MemoryBasicInformation(MemoryBasicInformation32 memInfo)
     {
@@ -43,19 +43,19 @@ internal struct MemoryBasicInformation32
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct MemoryBasicInformation64
+internal unsafe struct MemoryBasicInformation64
 {
     public nint BaseAddress;
     public nint AllocationBase;
-    public MemoryProtectionFlags AllocationProtect;
+    public PageProtectionFlags AllocationProtect;
     public uint Alignment1;
     public long RegionSize;
     public MemoryStateFlags State;
-    public MemoryProtectionFlags MemoryProtection;
+    public PageProtectionFlags MemoryProtection;
     public MemoryTypeFlags Type;
     public uint Alignment2;
 
-    public static readonly int StructSize = Marshal.SizeOf(typeof(MemoryBasicInformation64));
+    public static readonly int StructSize = sizeof(MemoryBasicInformation64);
 
     public static implicit operator MemoryBasicInformation(MemoryBasicInformation64 memInfo)
     {
@@ -72,7 +72,7 @@ internal struct MemoryBasicInformation64
     }
 }
 
-internal struct SystemInfo
+internal unsafe struct SystemInfo
 {
     public ushort ProcessorArchitecture;
     public ushort Reserved;
@@ -86,7 +86,7 @@ internal struct SystemInfo
     public ushort ProcessorLevel;
     public ushort ProcessorRevision;
 
-    public static readonly int StructSize = Marshal.SizeOf(typeof(SystemInfo));
+    public static readonly int StructSize = sizeof(SystemInfo);
 }
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -107,7 +107,7 @@ internal struct ProcessEntry32
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = FileNameSize)]
     public string ProcessName;
 
-    public static ProcessEntry32 Create() => new() { StructSize = Marshal.SizeOf(typeof(ProcessEntry32)) };
+    public static unsafe ProcessEntry32 Create() => new() { StructSize = Marshal.SizeOf<ProcessEntry32>() };
 }
 
 [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -131,5 +131,5 @@ internal struct ModuleEntry32
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = FileNameSize)]
     public string FileName;
 
-    public static ModuleEntry32 Create() => new() { StructSize = Marshal.SizeOf(typeof(ModuleEntry32)) };
+    public static unsafe ModuleEntry32 Create() => new() { StructSize = Marshal.SizeOf<ModuleEntry32>() };
 }

@@ -20,7 +20,7 @@ internal sealed class ModuleFunction : IEquatable<ModuleFunction>
                                                  && other.ModulePath.Equals(ModulePath, StringComparison.OrdinalIgnoreCase)
                                                  && other.FunctionName.Equals(FunctionName, StringComparison.OrdinalIgnoreCase);
     public override bool Equals(object? obj) => obj is ModuleFunction other && Equals(other);
-    public override int GetHashCode() => ProcessHandle.GetHashCode() ^ ModulePath.GetHashCode() ^ FunctionName.GetHashCode();
+    public override int GetHashCode() => HashCode.Combine(ProcessHandle, ModulePath, FunctionName);
 
     public override string ToString() => $"ProcessHandle: {ProcessHandle}, ModulePath: {ModulePath}, FunctionName: {FunctionName}";
 }

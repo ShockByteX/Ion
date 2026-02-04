@@ -8,8 +8,8 @@ public interface IMemoryProtection : IDisposable
 {
     nint Address { get; }
     int Size { get; }
-    MemoryProtectionFlags Protection { get; }
-    MemoryProtectionFlags OldProtection { get; }
+    PageProtectionFlags Protection { get; }
+    PageProtectionFlags OldProtection { get; }
 }
 
 internal sealed class MemoryProtection : IMemoryProtection
@@ -18,7 +18,7 @@ internal sealed class MemoryProtection : IMemoryProtection
 
     private bool _disposed;
 
-    private MemoryProtection(SafeProcessHandle handle, nint address, int size, MemoryProtectionFlags protection, MemoryProtectionFlags oldProtection)
+    private MemoryProtection(SafeProcessHandle handle, nint address, int size, PageProtectionFlags protection, PageProtectionFlags oldProtection)
     {
         _handle = handle;
         Address = address;
@@ -27,35 +27,29 @@ internal sealed class MemoryProtection : IMemoryProtection
         OldProtection = oldProtection;
     }
 
-    ~MemoryProtection() => Dispose();
-
     public nint Address { get; }
     public int Size { get; }
-    public MemoryProtectionFlags Protection { get; }
-    public MemoryProtectionFlags OldProtection { get; }
+    public PageProtectionFlags Protection { get; }
+    public PageProtectionFlags OldProtection { get; }
 
     public void Dispose()
     {
         if (!_disposed)
         {
             if (!_handle.IsClosed && !_handle.IsInvalid)
-            {
-                Ensure.Win32(Kernel32.VirtualProtectEx(_handle, Address, Size, OldProtection, out _));
-            }
+                Ensure.Win32(Kernel32.VirtualProtectEx(_handle, Address, (nuint)Size, OldProtection, out _));
 
             _disposed = true;
-            GC.SuppressFinalize(this);
         }
     }
 
     public override string ToString() => $"BaseAddress: 0x{Address.ToInt64():X}, Protection: {Protection}, OldProtection: {OldProtection}";
 
-    public static IMemoryProtection Change(SafeProcessHandle handle, nint address, int size, MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
+    public static IMemoryProtection Change(SafeProcessHandle handle, nint address, int size, PageProtectionFlags protection = PageProtectionFlags.ExecuteReadWrite)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
-        Ensure.OutOfRange(size, 0, int.MaxValue, nameof(size));
-        Ensure.Win32(Kernel32.VirtualProtectEx(handle, address, size, MemoryProtectionFlags.ExecuteReadWrite, out var oldProtection));
+        Ensure.Win32(Kernel32.VirtualProtectEx(handle, address, (nuint)size, protection, out var oldProtection));
 
         return new MemoryProtection(handle, address, size, protection, oldProtection);
     }

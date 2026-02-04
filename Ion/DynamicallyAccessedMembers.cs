@@ -7,5 +7,5 @@ namespace Ion;
 
 public static class DynamicallyAccessedMembers
 {
-    public const DynamicallyAccessedMemberTypes DefaultTypes = DynamicallyAccessedMemberTypes.All;
+    public const DynamicallyAccessedMemberTypes Default = DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.NonPublicConstructors;
 }

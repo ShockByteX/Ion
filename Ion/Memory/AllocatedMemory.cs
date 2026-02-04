@@ -23,7 +23,7 @@ internal sealed class AllocatedMemory : MemoryPointer, IAllocatedMemory
         Memory.Process.Handle.ReleaseMemoryPage(Address, Size);
     }
 
-    public static IAllocatedMemory Allocate(IProcessMemory memory, int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection)
+    public static IAllocatedMemory Allocate(IProcessMemory memory, int size, MemoryAllocationFlags allocation, PageProtectionFlags protection)
     {
         var address = Kernel32.VirtualAllocEx(memory.Process.Handle, nint.Zero, size, allocation, protection);
 

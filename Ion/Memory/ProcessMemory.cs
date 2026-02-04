@@ -1,7 +1,9 @@
-﻿using System.Text;
-using Ion.Extensions;
-using Ion.Marshaling;
+﻿using Ion.Extensions;
 using Ion.Interop;
+using Ion.Marshaling;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Ion.Memory;
 
@@ -12,14 +14,14 @@ public interface IProcessMemory
     IReadOnlyCollection<IMemoryRegion> GetMemoryRegions(nint minAddress, nint maxAddress);
 
     byte[] Read(nint address, int length);
-    T Read<T>(nint address) where T : struct;
-    T[] Read<T>(nint address, int length) where T : struct;
+    T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address) where T : unmanaged;
+    T[] Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, int length) where T : unmanaged;
     string Read(nint address, Encoding encoding, int maxLength);
-    string Read(nint address, Encoding encoding);
+    string Read(nint address, Encoding encoding);   
 
-    int Write(nint address, byte[] data);
-    void Write<T>(nint address, T value) where T : struct;
-    void Write<T>(nint address, T[] values) where T : struct;
+    int Write(nint address, ReadOnlySpan<byte> data);
+    void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, in T value) where T : unmanaged;
+    void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, T[] values) where T : unmanaged;
     void Write(nint address, string text, Encoding encoding);
 }
 
@@ -34,6 +36,7 @@ public abstract class ProcessMemory : IProcessMemory
 
     public IProcess Process { get; }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public IReadOnlyCollection<IMemoryRegion> GetMemoryRegions(nint minAddress, nint maxAddress)
     {
         var regions = new List<MemoryRegion>();
@@ -48,10 +51,11 @@ public abstract class ProcessMemory : IProcessMemory
         return regions;
     }
 
-    public T[] Read<T>(nint address, int length) where T : struct
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe T[] Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, int length) where T : unmanaged
     {
         var values = new T[length];
-        var size = MarshalType<T>.Size;
+        var size = sizeof(T);
 
         for (var i = 0; i < length; i++)
         {
@@ -61,6 +65,7 @@ public abstract class ProcessMemory : IProcessMemory
         return values;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Read(nint address, Encoding encoding)
     {
         var result = string.Empty;
@@ -68,13 +73,12 @@ public abstract class ProcessMemory : IProcessMemory
         char c;
 
         while ((c = Read<char>(nint.Add(address, offset++))) != NullTerminator)
-        {
             result += c;
-        }
 
         return result;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Read(nint address, Encoding encoding, int maxLength)
     {
         var data = Read(address, maxLength);
@@ -84,29 +88,34 @@ public abstract class ProcessMemory : IProcessMemory
         return ntIndex != -1 ? text.Remove(ntIndex) : text;
     }
 
-    public void Write<T>(nint address, T[] values) where T : struct
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public unsafe void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, T[] values) where T : unmanaged
     {
         var length = values.Length;
-        var size = MarshalType<T>.Size;
+        var size = sizeof(T);
 
         for (var i = 0; i < length; i++)
-        {
             Write(nint.Add(address, i * size), values[i]);
-        }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(nint address, string text, Encoding encoding)
     {
         if (text[^1] != NullTerminator)
-        {
             text += NullTerminator;
-        }
 
         Write(address, encoding.GetBytes(text));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public abstract byte[] Read(nint address, int length);
-    public abstract T Read<T>(nint address) where T : struct;
-    public abstract int Write(nint address, byte[] data);
-    public abstract void Write<T>(nint address, T value) where T : struct;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public abstract T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address) where T : unmanaged;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public abstract int Write(nint address, ReadOnlySpan<byte> data);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public abstract void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, in T value) where T : unmanaged;
 }

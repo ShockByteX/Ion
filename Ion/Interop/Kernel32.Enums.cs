@@ -32,7 +32,7 @@ public enum MemoryAllocationFlags
 }
 
 [Flags]
-public enum MemoryProtectionFlags : uint
+public enum PageProtectionFlags : uint
 {
     ZeroAccess = 0x0,
     NoAccess = 0x1,

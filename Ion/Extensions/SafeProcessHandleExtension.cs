@@ -1,33 +1,32 @@
-﻿using System.ComponentModel;
+﻿using Ion.Interop;
+using Ion.Interop.Handles;
 using Ion.Memory;
-using Ion.Interop;
 using Ion.Properties;
 using Ion.Validation;
-using Ion.Interop.Handles;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Ion.Extensions;
 
 internal static class SafeProcessHandleExtension
 {
-    public static byte[] ReadMemory(this SafeProcessHandle handle, nint address, int length)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ReadMemory(this SafeProcessHandle handle, nint address, nint buffer, int size)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
 
-        var data = new byte[length];
-        var errorMessage = string.Format(Resources.ErrorFailedToReadFrom, address.ToHexadecimalString());
-
-        Ensure.Win32(Kernel32.ReadProcessMemory(handle, address, data, length, out var nbBytesRead) && length == nbBytesRead, errorMessage);
-
-        return data;
+        Ensure.Win32(Kernel32.ReadProcessMemory(handle, address, buffer, (nuint)size, out var read) && size == (int)read,
+            () => string.Format(Resources.ErrorFailedToReadFrom, address.ToHexadecimalString()));
     }
 
-    public static int WriteMemory(this SafeProcessHandle handle, nint address, byte[] data)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int WriteMemory(this SafeProcessHandle handle, nint address, nint buffer, int size)
     {
-        return handle.WriteMemoryProtected(address, data.Length, () =>
+        return handle.WriteMemoryProtected(address, size, () =>
         {
-            Ensure.Win32(Kernel32.WriteProcessMemory(handle, address, data, data.Length, out var written));
-            Ensure.Win32(written == data.Length);
+            Ensure.Win32(Kernel32.WriteProcessMemory(handle, address, buffer, (nuint)size, out var written));
+            Ensure.Win32((int)written == size);
         });
     }
 
@@ -56,7 +55,7 @@ internal static class SafeProcessHandleExtension
         }
     }
 
-    public static MemoryProtectionFlags GetMemoryProtection(this SafeProcessHandle handle, nint address)
+    public static PageProtectionFlags GetMemoryProtection(this SafeProcessHandle handle, nint address)
     {
         Ensure.Win32(Query(handle, address, out var memoryInfo) > 0);
 
@@ -76,13 +75,13 @@ internal static class SafeProcessHandleExtension
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
-        Ensure.Win32(Kernel32.VirtualFreeEx(handle, address, 0, MemoryReleaseFlags.Release), string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
+        Ensure.Win32(Kernel32.VirtualFreeEx(handle, address, 0, MemoryReleaseFlags.Release), () => string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
     }
 
     public static void ReleaseMemoryPage(this SafeProcessHandle handle, nint address, int size)
     {
         Ensure.IsValid(handle);
         Ensure.IsValid(address);
-        Ensure.Win32(Kernel32.VirtualFreeEx(handle, address, size, MemoryReleaseFlags.Decommit), string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
+        Ensure.Win32(Kernel32.VirtualFreeEx(handle, address, size, MemoryReleaseFlags.Decommit), () => string.Format(Resources.ErrorFailedToReleaseMemoryPage, address.ToHexadecimalString()));
     }
 }

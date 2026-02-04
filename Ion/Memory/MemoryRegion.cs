@@ -16,7 +16,7 @@ public interface IMemoryRegion : IEquatable<IMemoryRegion>, IMemoryPointer
     bool IsInRange(nint address);
     bool IsInRange(long address);
 
-    IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite);
+    IMemoryProtection ChangeProtection(PageProtectionFlags protection = PageProtectionFlags.ExecuteReadWrite);
     void Release();
 }
 
@@ -36,24 +36,24 @@ internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRe
 
     public override bool IsValid => base.IsValid && Information.State != MemoryStateFlags.Free;
 
-    public bool IsReadable => Information.MemoryProtection is MemoryProtectionFlags.ReadOnly
-        or MemoryProtectionFlags.ReadWrite
-        or MemoryProtectionFlags.ExecuteRead
-        or MemoryProtectionFlags.ExecuteReadWrite;
+    public bool IsReadable => Information.MemoryProtection is PageProtectionFlags.ReadOnly
+        or PageProtectionFlags.ReadWrite
+        or PageProtectionFlags.ExecuteRead
+        or PageProtectionFlags.ExecuteReadWrite;
 
-    public bool IsWritable => Information.MemoryProtection is MemoryProtectionFlags.ReadWrite
-        or MemoryProtectionFlags.WriteCopy
-        or MemoryProtectionFlags.ExecuteReadWrite
-        or MemoryProtectionFlags.ExecuteWriteCopy
-        or MemoryProtectionFlags.WriteCombine;
+    public bool IsWritable => Information.MemoryProtection is PageProtectionFlags.ReadWrite
+        or PageProtectionFlags.WriteCopy
+        or PageProtectionFlags.ExecuteReadWrite
+        or PageProtectionFlags.ExecuteWriteCopy
+        or PageProtectionFlags.WriteCombine;
 
-    public bool IsExecutable => Information.MemoryProtection is MemoryProtectionFlags.Execute
-        or MemoryProtectionFlags.ExecuteRead
-        or MemoryProtectionFlags.ExecuteReadWrite
-        or MemoryProtectionFlags.ExecuteWriteCopy
-        or MemoryProtectionFlags.WriteCombine;
+    public bool IsExecutable => Information.MemoryProtection is PageProtectionFlags.Execute
+        or PageProtectionFlags.ExecuteRead
+        or PageProtectionFlags.ExecuteReadWrite
+        or PageProtectionFlags.ExecuteWriteCopy
+        or PageProtectionFlags.WriteCombine;
 
-    public bool IsGuarded => Information.MemoryProtection.HasFlag(MemoryProtectionFlags.Guard);
+    public bool IsGuarded => Information.MemoryProtection.HasFlag(PageProtectionFlags.Guard);
     public bool IsOperableGuarded => (IsReadable | IsWritable | IsExecutable) && IsGuarded;
 
     public bool IsInRange(nint address) => IsInRange(address.ToInt64());
@@ -64,7 +64,7 @@ internal class MemoryRegion : MemoryPointer, IEquatable<MemoryRegion>, IMemoryRe
         return address > regionAddressValue && address < regionAddressValue + Information.RegionSize;
     }
 
-    public IMemoryProtection ChangeProtection(MemoryProtectionFlags protection = MemoryProtectionFlags.ExecuteReadWrite)
+    public IMemoryProtection ChangeProtection(PageProtectionFlags protection = PageProtectionFlags.ExecuteReadWrite)
     {
         return MemoryProtection.Change(Memory.Process.Handle, Address, (int)Information.RegionSize, protection);
     }

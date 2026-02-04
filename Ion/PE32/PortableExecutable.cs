@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Ion.PE32;
 
@@ -30,10 +31,10 @@ public sealed class PortableExecutable
 
     public ImageSectionHeader GetSection(string name) => EnumerateSections().First(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     public IReadOnlyCollection<ImageSectionHeader> GetSections() => EnumerateSections().ToArray();
-    public T Read<T>(int offset) where T : struct => _binary.Read<T>(offset);
+    public T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset) where T : unmanaged => _binary.Read<T>(offset);
     public string ReadText(int offset) => _binary.Read(offset, Encoding.UTF8, 256);
 
-    public T ReadDataTable<T>(ImageDirectoryEntry entry) where T : struct
+    public T ReadDataTable<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(ImageDirectoryEntry entry) where T : unmanaged
     {
         var directory = this[entry];
         var section = this[directory];

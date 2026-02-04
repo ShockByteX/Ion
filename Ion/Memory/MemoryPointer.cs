@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Ion.Memory;
 
@@ -10,38 +12,48 @@ public interface IMemoryPointer : IEquatable<IMemoryPointer>
     bool IsValid { get; }
 
     byte[] Read(int offset, int length);
-    T Read<T>(int offset) where T : struct;
-    T[] Read<T>(int offset, int length) where T : struct;
+    T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset) where T : unmanaged;
+    T[] Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, int length) where T : unmanaged;
     string Read(int offset, Encoding encoding, int maxLength);
     string Read(int offset, Encoding encoding);
 
     void Write(int offset, string text, Encoding encoding);
-    void Write<T>(int offset, T value) where T : struct;
-    void Write<T>(int offset, T[] values) where T : struct;
-    int Write(int offset, byte[] data);
+    void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, in T value) where T : unmanaged;
+    void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, T[] values) where T : unmanaged;
+    int Write(int offset, ReadOnlySpan<byte> data);
 }
 
-internal class MemoryPointer : IEquatable<MemoryPointer>, IMemoryPointer
+internal class MemoryPointer(IProcessMemory memory, nint address) : IEquatable<MemoryPointer>, IMemoryPointer
 {
-    public MemoryPointer(IProcessMemory memory, nint address)
-    {
-        Memory = memory;
-        Address = address;
-    }
-
-    public IProcessMemory Memory { get; }
-    public nint Address { get; protected set; }
+    public IProcessMemory Memory { get; } = memory;
+    public nint Address { get; protected set; } = address;
     public virtual bool IsValid => Address != nint.Zero;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Read(int offset, int length) => Memory.Read(Address + offset, length);
-    public T Read<T>(int offset) where T : struct => Memory.Read<T>(Address + offset);
-    public T[] Read<T>(int offset, int count) where T : struct => Memory.Read<T>(Address + offset, count);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset) where T : unmanaged => Memory.Read<T>(Address + offset);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public T[] Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, int count) where T : unmanaged => Memory.Read<T>(Address + offset, count);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Read(int offset, Encoding encoding, int maxLength) => Memory.Read(Address + offset, encoding, maxLength);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public string Read(int offset, Encoding encoding) => Memory.Read(Address + offset, encoding);
 
-    public int Write(int offset, byte[] data) => Memory.Write(Address + offset, data);
-    public void Write<T>(int offset, T value) where T : struct => Memory.Write(Address + offset, value);
-    public void Write<T>(int offset, T[] values) where T : struct => Memory.Write(Address + offset, values);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Write(int offset, ReadOnlySpan<byte> data) => Memory.Write(Address + offset, data);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, in T value) where T : unmanaged => Memory.Write(Address + offset, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Write<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset, T[] values) where T : unmanaged => Memory.Write(Address + offset, values);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(int offset, string text, Encoding encoding) => Memory.Write(Address + offset, text, encoding);
 
     public bool Equals(MemoryPointer? other) => Equals((IMemoryPointer?)other);

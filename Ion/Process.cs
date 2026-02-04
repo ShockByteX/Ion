@@ -1,12 +1,12 @@
 ﻿using Ion.Engine;
-using Ion.Marshaling;
+using Ion.Extensions;
+using Ion.Interop;
+using Ion.Interop.Handles;
 using Ion.Memory;
 using Ion.Modules;
-using Ion.Interop;
-using Ion.Extensions;
-using Ion.Validation;
 using Ion.Threading;
-using Ion.Interop.Handles;
+using Ion.Validation;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Ion;
 
@@ -24,8 +24,8 @@ public interface IProcess
     IMemoryPointer this[nint address] { get; }
     IProcessModule this[string moduleName] { get; }
 
-    MemoryObject<T> AllocateObject<T>() where T : struct;
-    IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection);
+    MemoryObject<T> AllocateObject<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>() where T : unmanaged;
+    IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, PageProtectionFlags protection);
     IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags);
     nint ScanFirst(string pattern);
     IReadOnlyCollection<IMemoryRegion> GetMemoryRegions();
@@ -63,8 +63,8 @@ public sealed class ExtendedProcess : IProcessDisposable
     public IMemoryPointer this[nint address] => new MemoryPointer(Memory, address);
     public IProcessModule this[string moduleName] => ModuleManager[moduleName];
 
-    public MemoryObject<T> AllocateObject<T>() where T : struct => MemoryObject<T>.Allocate(this, MarshalType<T>.Size);
-    public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, MemoryProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
+    public unsafe MemoryObject<T> AllocateObject<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>() where T : unmanaged => MemoryObject<T>.Allocate(this, sizeof(T));
+    public IAllocatedMemory AllocateMemory(int size, MemoryAllocationFlags allocation, PageProtectionFlags protection) => AllocatedMemory.Allocate(Memory, size, allocation, protection);
 
     public IProcessThreadDisposable CreateThread(nint functionPointer, nint parameterPointer, ThreadCreationFlags flags)
     {

@@ -36,7 +36,7 @@ internal sealed class ProcessFunction(IProcess process, nint address, string nam
 
     public int Execute(string parameter, Encoding encoding)
     {
-        using var allocatedMemory = process.AllocateMemory(encoding.GetByteCount(parameter) + 1, MemoryAllocationFlags.Commit | MemoryAllocationFlags.Reserve, MemoryProtectionFlags.ReadWrite);
+        using var allocatedMemory = process.AllocateMemory(encoding.GetByteCount(parameter) + 1, MemoryAllocationFlags.Commit | MemoryAllocationFlags.Reserve, PageProtectionFlags.ReadWrite);
         allocatedMemory.Write(0, parameter, encoding);
         return Execute(allocatedMemory.Address);
     }

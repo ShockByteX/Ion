@@ -1,5 +1,7 @@
 ﻿using Ion.Marshaling;
 using Ion.Validation;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Ion.PE32;
@@ -17,7 +19,11 @@ internal class PortableExecutableBinary
 
     public byte[] Read(int offset, int length) => _data[offset..(offset + length)];
 
-    public T Read<T>(int offset) where T : struct => MarshalType<T>.ToValue(Read(offset, MarshalType<T>.Size));
+    public unsafe T Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(int offset) where T : struct
+    {
+        fixed(byte* pointer = &_data[offset])
+            return Marshal.PtrToStructure<T>((nint)pointer);
+    }
 
     public string Read(int offset, Encoding encoding, int maxLength)
     {

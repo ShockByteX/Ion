@@ -8,7 +8,7 @@ public static class Drivers
 {
     public static nint Find(string driverName)
     {
-        var addresses = Enum();
+        var addresses = List();
 
         foreach (var address in addresses)
         {
@@ -25,7 +25,7 @@ public static class Drivers
         return nint.Zero;
     }
 
-    public static IReadOnlyCollection<nint> Enum()
+    public static IReadOnlyCollection<nint> List()
     {
         Ensure.That(Psapi.EnumDeviceDrivers(null, 0, out var bytesNeeded));
 

@@ -41,22 +41,23 @@ internal static class IntPtrExtension
         }
     }
 
-    public static unsafe int WriteMemory(this nint address, SafeProcessHandle handle, byte[] data, bool copy = false)
+    public static unsafe int WriteMemory(this nint address, SafeProcessHandle handle, ReadOnlySpan<byte> data, bool copy = false)
     {
-        return handle.WriteMemoryProtected(address, data.Length, () =>
-        {
-            if (copy)
-            {
-                fixed (byte* pData = data)
-                {
-                    Msvcrt.memcpy(address, (nint)pData, data.Length);
-                }
-            }
-            else
-            {
-                Unsafe.Write(address.ToPointer(), data);
-            }
-        });
+        throw new NotImplementedException();
+        //return handle.WriteMemoryProtected(address, data.Length, () =>
+        //{
+        //    if (copy)
+        //    {
+        //        fixed (byte* pData = data)
+        //        {
+        //            Msvcrt.memcpy(address, (nint)pData, data.Length);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Unsafe.Write(address.ToPointer(), data);
+        //    }
+        //});
     }
 
     public static unsafe T Read<T>(this nint address)
@@ -72,9 +73,9 @@ internal static class IntPtrExtension
         }
     }
 
-    public static unsafe int Write<T>(this nint address, SafeProcessHandle handle, T value) where T : struct
+    public static unsafe int Write<T>(this nint address, SafeProcessHandle handle, T value) where T : unmanaged
     {
-        return handle.WriteMemoryProtected(address, MarshalType<T>.Size, () =>
+        return handle.WriteMemoryProtected(address, sizeof(T), () =>
         {
             Unsafe.Write(address.ToPointer(), value);
         });

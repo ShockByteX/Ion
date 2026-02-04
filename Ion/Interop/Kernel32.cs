@@ -1,5 +1,6 @@
-﻿using System.Runtime.InteropServices;
-using Ion.Interop.Handles;
+﻿using Ion.Interop.Handles;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Ion.Interop;
 
@@ -21,11 +22,17 @@ internal unsafe partial class Kernel32
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool DuplicateHandle(nint hSourceProcessHandle, nint hSourceHandle, nint hTargetProcessHandle, out nint lpTargetHandle, uint dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle, uint dwOptions);
 
+    [LibraryImport(LibraryName, SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    public static partial int QueryDosDeviceW(string? lpDeviceName, Span<char> lpTargetPath, uint ucchMax);
+
     [DllImport(LibraryName, SetLastError = true, CharSet = CharSet.Ansi)]
     public static extern nint GetProcAddress(nint hModule, string procName);
 
-    [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
-    public static extern bool VirtualProtectEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryProtectionFlags flNewProtect, out MemoryProtectionFlags lpflOldProtect);
+    [SuppressUnmanagedCodeSecurity]
+    [SuppressGCTransition]
+    [LibraryImport(LibraryName, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static partial bool VirtualProtectEx(SafeProcessHandle hProcess, nint lpAddress, nuint dwSize, PageProtectionFlags flNewProtect, out PageProtectionFlags lpflOldProtect);
 
     [DllImport(LibraryName, EntryPoint = "VirtualQueryEx", SetLastError = true)]
     public static extern int VirtualQueryEx32(SafeProcessHandle hProcess, nint lpAddress, out MemoryBasicInformation32 lpBuffer, int dwLength);
@@ -34,7 +41,7 @@ internal unsafe partial class Kernel32
     public static extern int VirtualQueryEx64(SafeProcessHandle hProcess, nint lpAddress, out MemoryBasicInformation64 lpBuffer, int dwLength);
 
     [DllImport(LibraryName, SetLastError = true)]
-    public static extern nint VirtualAllocEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryAllocationFlags flAllocationType, MemoryProtectionFlags flProtect);
+    public static extern nint VirtualAllocEx(SafeProcessHandle hProcess, nint lpAddress, int dwSize, MemoryAllocationFlags flAllocationType, PageProtectionFlags flProtect);
 
     [DllImport(LibraryName, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -43,13 +50,17 @@ internal unsafe partial class Kernel32
     [DllImport(LibraryName, EntryPoint = "RtlMoveMemory", SetLastError = true)]
     public static extern void MoveMemory(void* dest, void* src, int size);
 
-    [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
+    [SuppressUnmanagedCodeSecurity]
+    [SuppressGCTransition]
+    [LibraryImport(LibraryName, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool ReadProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
+    public static partial bool ReadProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, nint lpBuffer, nuint nSize, [Optional] out nuint lpNumberOfBytesRead);
 
-    [DllImport(LibraryName, ExactSpelling = true, SetLastError = true)]
+    [SuppressUnmanagedCodeSecurity]
+    [SuppressGCTransition]
+    [LibraryImport(LibraryName, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool WriteProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, byte[] lpBuffer, int nSize, out int lpNumberOfBytesWritten);
+    public static partial bool WriteProcessMemory(SafeProcessHandle hProcess, nint lpBaseAddress, nint lpBuffer, nuint nSize, [Optional] out nuint lpNumberOfBytesWritten);
 
     [DllImport(LibraryName, SetLastError = true)]
     public static extern void GetSystemInfo(out SystemInfo lpSystemInfo);

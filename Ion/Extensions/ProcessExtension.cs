@@ -35,18 +35,16 @@ public static class ProcessExtension
         }
     }
 
-    private static void SuspendResume(ProcessThread thread, Action<nint> act)
+    private static void SuspendResume(ProcessThread thread, Action<nint> action)
     {
         var threadHandle = Kernel32.OpenThread(ThreadAccess.SuspendResume, false, thread.Id);
 
         if (threadHandle == nint.Zero)
-        {
             return;
-        }
 
         try
         {
-            act(threadHandle);
+            action(threadHandle);
         }
         finally
         {
