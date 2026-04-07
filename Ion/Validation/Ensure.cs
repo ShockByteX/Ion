@@ -53,9 +53,9 @@ public static class Ensure
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ThatSuccess(NtStatus status)
+    public static void NtStatus(NtStatus status)
     {
-        if (status is not NtStatus.Success)
+        if (status is not Interop.NtStatus.Success)
             throw new NtStatusException(status);
     }
 

@@ -1,6 +1,5 @@
 ﻿using Ion.Extensions;
 using Ion.Interop;
-using Ion.Marshaling;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -55,11 +54,10 @@ public abstract class ProcessMemory : IProcessMemory
     public unsafe T[] Read<[DynamicallyAccessedMembers(DynamicallyAccessedMembers.Default)] T>(nint address, int length) where T : unmanaged
     {
         var values = new T[length];
-        var size = sizeof(T);
 
-        for (var i = 0; i < length; i++)
+        fixed (T* pointer = values)
         {
-            values[i] = Read<T>(nint.Add(address, i * size));
+            Process.Handle.ReadMemory(address, (nint)pointer, checked(length * sizeof(T)));
         }
 
         return values;

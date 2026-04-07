@@ -23,7 +23,7 @@ internal unsafe struct ObjectAttributes
 [StructLayout(LayoutKind.Sequential)]
 internal struct IoStatusBlock
 {
-    public uint Status;
+    public NtStatus Status;
     public nint Information;
 }
 
@@ -37,7 +37,7 @@ public struct UnicodeString
 
 public sealed class SafeUnicodeString : IDisposable
 {
-    private static readonly ushort MaxUnicodeLength = (ushort.MaxValue - 2) >> 1;
+    private const ushort MaxUnicodeLength = (ushort.MaxValue - 2) >> 1;
 
     private UnicodeString _value;
 

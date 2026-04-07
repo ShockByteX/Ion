@@ -89,8 +89,8 @@ public static unsafe class SignatureScanner
         {
             var knownBytes = new bool[256];
 
-            for (var i = 0; i < pattern.Length; i++)
-                knownBytes[pattern[i]] = true;
+            foreach (var b in pattern)
+                knownBytes[b] = true;
 
             var wildcard = Array.IndexOf(knownBytes, false);
 

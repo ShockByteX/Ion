@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Ion.Interop.Handles;
 
-public class DeviceHandle : IDisposable
+internal sealed class DeviceHandle : IDisposable
 {
     private nint _handle;
 
@@ -40,7 +40,7 @@ public class DeviceHandle : IDisposable
 
         var statusBlock = new IoStatusBlock();
 
-        Ensure.ThatSuccess(Ntdll.NtCreateFile(out var handle,
+        Ensure.NtStatus(Ntdll.NtCreateFile(out var handle,
             rights,
             &attributes,
             &statusBlock,
